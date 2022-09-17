@@ -1,6 +1,6 @@
 {
   "name": "@yhostc/nest-nacos",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Nacos client for nestjs",
   "author": "yhostc@gmail.com",
   "license": "MIT",
@@ -12,8 +12,8 @@
     "@nestjs/common": "^9.0.11"
   },
   "dependencies": {
-    "nacos": "^2.5.0",
     "@nestjs/common": "^9.0.11",
+    "nacos": "^2.5.0",
     "properties-file": "^2.1.5",
     "yaml": "^2.1.1"
   },

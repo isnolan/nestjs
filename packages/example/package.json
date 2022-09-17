@@ -1,6 +1,6 @@
 {
   "name": "@yhostc/example",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "microservice example for nestjs",
   "author": "yhostc@gmail.com",
   "scripts": {
@@ -15,7 +15,7 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
-    "@yhostc/nest-nacos": "^0.0.1",
+    "@yhostc/nest-nacos": "^0.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
