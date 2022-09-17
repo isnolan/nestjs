@@ -1,5 +1,6 @@
 {
   "name": "nestjs",
+  "version": "0.0.1",
   "private": true,
   "description": "Microservice architecture for Nestjs",
   "scripts": {
