@@ -1,10 +1,5 @@
 import { NacosNamingClient } from 'nacos';
-import {
-  Inject,
-  Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { NamingOptions, Instance, InstanceOption } from './interfaces';
 import { NAMING_OPTION } from './constants';
 
@@ -31,19 +26,11 @@ export class NacosNamingService implements OnModuleInit, OnModuleDestroy {
     await this.client.ready();
   }
 
-  async registerInstance(
-    serviceName: string,
-    instance: InstanceOption,
-    groupName?: string,
-  ): Promise<void> {
+  async registerInstance(serviceName: string, instance: InstanceOption, groupName?: string): Promise<void> {
     return this.client.registerInstance(serviceName, instance, groupName);
   }
 
-  async deregisterInstance(
-    serviceName: string,
-    instance: InstanceOption,
-    groupName?: string,
-  ): Promise<void> {
+  async deregisterInstance(serviceName: string, instance: InstanceOption, groupName?: string): Promise<void> {
     return this.client.deregisterInstance(serviceName, instance, groupName);
   }
 
@@ -62,12 +49,7 @@ export class NacosNamingService implements OnModuleInit, OnModuleDestroy {
     subscribe?: boolean,
   ): Promise<Instance[] | string[]> {
     // Naocs have an type error for Instance
-    return this.client.getAllInstances(
-      serviceName,
-      groupName,
-      clusters,
-      subscribe,
-    );
+    return this.client.getAllInstances(serviceName, groupName, clusters, subscribe);
   }
 
   /**
@@ -85,9 +67,7 @@ export class NacosNamingService implements OnModuleInit, OnModuleDestroy {
    * @returns
    */
   async subscribe(
-    info:
-      | string
-      | { serviceName: string; groupName?: string; clusters?: string },
+    info: string | { serviceName: string; groupName?: string; clusters?: string },
     listener?: (instances: Instance[] | string[]) => void,
   ): Promise<void> {
     return this.client.subscribe(info, listener);
@@ -100,9 +80,7 @@ export class NacosNamingService implements OnModuleInit, OnModuleDestroy {
    * @returns
    */
   async unSubscribe(
-    info:
-      | string
-      | { serviceName: string; groupName?: string; clusters?: string },
+    info: string | { serviceName: string; groupName?: string; clusters?: string },
     listener: (instances: Instance[] | string[]) => void,
   ): Promise<void> {
     return this.client.unSubscribe(info, listener);

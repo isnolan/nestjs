@@ -12,3 +12,12 @@ node_modules/
 /index.js
 /index.d.ts
 .idea
+
+
+# bundle
+packages/**/*.d.ts
+packages/**/*.js
+
+
+# example
+# packages/example

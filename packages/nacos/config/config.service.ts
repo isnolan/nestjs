@@ -15,10 +15,7 @@ export class NacosConfigService implements OnModuleInit, OnModuleDestroy {
     listener: (content: string) => void;
   }>();
 
-  constructor(
-    @Inject(CONFIG_OPTION) options: ConfigOptions,
-    private readonly container: ModulesContainer,
-  ) {
+  constructor(@Inject(CONFIG_OPTION) options: ConfigOptions, private readonly container: ModulesContainer) {
     // Config client instance
     const { server: serverAddr, namespace } = options;
     this.client = new NacosConfigClient({ serverAddr, namespace });

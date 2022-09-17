@@ -4,38 +4,21 @@
   "description": "Nacos client for nestjs",
   "author": "yhostc@gmail.com",
   "license": "MIT",
-  "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "test:watch": "jest --watch",
-    "build": "rm -rf ./dist && tsc && npm run build:index",
-    "build:index": "rm -rf ./index.js ./index.d.ts && tsc -d --skipLibCheck ./index.ts",
-    "format": "prettier **/**/*.ts --ignore-path ./.prettierignore --write && git status",
-    "prepublish": "npm run format && npm run build"
+    "prebuild": "rimraf dist",
+    "build": "nest build"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^9.0.11"
   },
   "dependencies": {
-    "@nestjs/common": "^9.0.11",
-    "@nestjs/core": "^9.0.11",
-    "@types/node": "^16.9.6",
-    "dotenv": "^10.0.0",
-    "glob": "^7.1.2",
-    "lodash.get": "^4.4.2",
-    "lodash.set": "^4.3.2",
     "nacos": "^2.5.0",
+    "@nestjs/common": "^9.0.11",
     "properties-file": "^2.1.5",
-    "reflect-metadata": "^0.1.12",
-    "rxjs": "^7.5.6",
     "yaml": "^2.1.1"
   },
   "devDependencies": {
-    "@nestjs/testing": "^9.0.11",
-    "@types/glob": "^7.1.1",
-    "@types/jest": "^27.0.2",
-    "jest": "^26.6.3",
-    "prettier": "^2.2.1",
-    "ts-jest": "^26.5.6",
-    "typescript": "^4.2.4"
+    "rimraf": "^3.0.2"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -53,5 +36,6 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  }
+  },
+  "gitHead": "aae7ab9a3589c2dfd0c42ba809b1993b6026dd81"
 }

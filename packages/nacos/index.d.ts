@@ -1,1 +1,2 @@
-export * from './dist';
+export * from './config';
+export * from './naming';
