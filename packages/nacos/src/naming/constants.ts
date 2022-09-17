@@ -1,0 +1,1 @@
+export const NAMING_OPTION = 'NAMING_OPTION';

@@ -1,0 +1,14 @@
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+lib-cov
+coverage/
+node_modules/
+.env
+!src/__tests__/__stubs__/.env
+
+/index.js
+/index.d.ts
+.idea
