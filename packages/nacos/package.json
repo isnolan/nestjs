@@ -1,6 +1,6 @@
 {
   "name": "@yhostc/nest-nacos",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Nacos client for nestjs",
   "author": "yhostc@gmail.com",
   "license": "MIT",
