@@ -4,6 +4,9 @@
   "private": true,
   "description": "Microservice architecture for Nestjs",
   "scripts": {
+    "bootstrap": "npx lerna bootstrap",
+    "build": "npx lerna run build",
+    "publish": "npx lerna run publish",
     "prepare": "husky install",
     "postinstall": "npx husky install",
     "precommit": "lint-staged && npm run lint && npm run test"

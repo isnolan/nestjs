@@ -1,9 +1,10 @@
 {
   "name": "@yhostc/nest-nacos",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Nacos client for nestjs",
   "author": "yhostc@gmail.com",
   "license": "MIT",
+  "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build"
