@@ -2,13 +2,25 @@
   "name": "nestjs",
   "version": "0.0.1",
   "private": true,
-  "description": "Microservice architecture for Nestjs",
+  "description": "A collection of Bodhi modules and utilities to help you level up your NestJS application.",
   "scripts": {
-    "bootstrap": "npx lerna bootstrap",
-    "build": "npx lerna run build",
-    "prepare": "husky install",
-    "postinstall": "npx husky install",
-    "precommit": "lint-staged && npm run lint && npm run test"
+    "build": "turbo run build",
+    "commit": "cz",
+    "build:clean": "turbo run clean:build",
+    "lint-format": "turbo run --parallel lint format ",
+    "lint-format:fix": "turbo run --parallel lint:fix format:fix",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "eslint . --ext .js,.ts --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "turbo run --parallel test",
+    "typecheck": "turbo run --parallel typecheck",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && pnpm release:only",
+    "release:only": "changeset publish --registry=https://registry.npmjs.com/",
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "husky install"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -16,20 +28,33 @@
       "prettier --write"
     ]
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
+    "@changesets/cli": "^2.22.0",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "8.19.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
-    "lerna": "^5.5.1",
+    "typescript": "^5.2.2",
     "prettier": "2.7.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@7.0.1",
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=7.5.1"
   }
 }

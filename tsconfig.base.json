@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "incremental": true,
+    "declaration": true,
+    "allowJs": true,
+    "noEmit": true,
+    "module": "esnext",
+    "target": "es2020",
+    "moduleResolution": "node",
+
+    /* Strict Type-Checking Options */
+    // "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "resolveJsonModule": true,
+
+    /* Experimental Options */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+
+    /* Module Resolution Options */
+    "baseUrl": ".", // This must be specified if "paths" is.
+    "paths": {
+      "*": ["packages/*", "apps/*"]
+    },
+
+    /* Additional Options */
+    "lib": ["esnext", "dom"] // 添加这一行
+  }
+}

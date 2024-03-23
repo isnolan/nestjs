@@ -1,5 +1,5 @@
 {
-  "name": "@yhostc/nest-nacos",
+  "name": "@isnolan/nestjs-nacos",
   "version": "1.0.3",
   "description": "Nacos client for nestjs",
   "author": "yhostc@gmail.com",

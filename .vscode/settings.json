@@ -1,13 +1,22 @@
 {
-  "terminal.integrated.defaultProfile.osx": "zsh",
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "terminal.integrated.defaultProfile.osx": "zsh",
   "eslint.alwaysShowStatus": true,
   "editor.formatOnSave": true,
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
   "files.associations": {
     "*.env*": "properties"
-  }
+  },
+  "i18n-ally.frameworks.ruby-rails.scopeRoot": "src",
+  "i18n-ally.translate.engines": ["google", "google-cn", "deepl", "libretranslate"],
+  "i18n-ally.extract.keyMaxLength": 40,
+  "i18n-ally.displayLanguage": "zh-CN",
+  "prettier.prettierPath": "node_modules/prettier/index.cjs"
 }
