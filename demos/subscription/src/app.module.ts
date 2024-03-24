@@ -9,14 +9,14 @@ dotenv.config();
   imports: [
     SubscriptionModule.forRoot({
       stripe: {
-        apiSecretKey: `${process.env.STRIPE_SECRET_KEY}`,
-        webhookSecret: `${process.env.STRIPE_SECRET_WEBHOOK}`,
+        apiSecretKey: process.env.STRIPE_SECRET_KEY,
+        webhookSecret: process.env.STRIPE_SECRET_WEBHOOK,
       },
       apple: {
-        signingKey: `${process.env.APPLE_SIGNING_KEY}`,
-        keyId: `${process.env.APPLE_KEY_ID}`,
-        issuerId: `${process.env.APPLE_ISSUER_ID}`,
-        bundleId: `${process.env.APPLE_BUNDLE_ID}`,
+        signingKey: process.env.APPLE_SIGNING_KEY,
+        keyId: process.env.APPLE_KEY_ID,
+        issuerId: process.env.APPLE_ISSUER_ID,
+        bundleId: process.env.APPLE_BUNDLE_ID,
         environment: 'Sandbox',
       },
     }),
