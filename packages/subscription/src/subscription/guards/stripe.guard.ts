@@ -5,7 +5,7 @@ import { StripeProviderService } from '../provider';
 @Injectable()
 export class StripeGuard implements CanActivate {
   constructor(
-    @Inject('PAYMENT_CONFIG')
+    @Inject('CONFIG')
     private readonly config,
     private readonly provider: StripeProviderService,
   ) {}

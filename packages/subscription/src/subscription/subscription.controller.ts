@@ -18,17 +18,17 @@ export class SubscriptionController {
     await this.service.dispatchEvent('stripe', event.type, event);
   }
 
+  @Post('apple')
+  @UseGuards(AppleGuard)
+  async handleApplePay(@Req() request: RequestWithEvent) {
+    const { event } = request;
+    await this.service.dispatchEvent('apple', event.notificationType, event);
+  }
+
   @Post('google')
   @UseGuards(GoogleGuard)
   async handleGooglePay(@Req() request: RequestWithEvent) {
     const { event } = request;
     await this.service.dispatchEvent('google', event.type, event);
-  }
-
-  @Post('apple')
-  @UseGuards(AppleGuard)
-  async handleApplePay(@Req() request: RequestWithEvent) {
-    const { event } = request;
-    await this.service.dispatchEvent('apple', event.type, event);
   }
 }

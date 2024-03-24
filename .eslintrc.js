@@ -15,5 +15,6 @@ module.exports = {
     'prettier/prettier': ['error', { printWidth: 120 }],
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    "@typescript-eslint/no-namespace": "off"
   },
 };

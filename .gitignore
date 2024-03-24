@@ -13,7 +13,7 @@ node_modules/
 /index.d.ts
 .idea
 dist
-certs
+.certs
 
 # bundle
 .tsbuildinfo
