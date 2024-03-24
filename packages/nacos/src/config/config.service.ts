@@ -1,11 +1,11 @@
-import { NacosConfigClient } from 'nacos';
-import { parse as yamlToJson } from 'yaml';
-import { propertiesToJson } from 'properties-file/content';
 import { Inject, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
+import { NacosConfigClient } from 'nacos';
+import { propertiesToJson } from 'properties-file/content';
+import { parse as yamlToJson } from 'yaml';
 
+import { CONFIG_METAKEY, CONFIG_OPTION, ConfigType } from './constants';
 import { ConfigOptions } from './interfaces';
-import { CONFIG_OPTION, CONFIG_METAKEY, ConfigType } from './constants';
 
 export class NacosConfigService implements OnModuleInit, OnModuleDestroy {
   private client: NacosConfigClient = null;

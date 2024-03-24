@@ -1,7 +1,8 @@
-import { Global, Module, DynamicModule } from '@nestjs/common';
-import { NacosNamingService } from './naming.service';
+import { DynamicModule, Global, Module } from '@nestjs/common';
+
 import { NAMING_OPTION } from './constants';
-import { NamingOptions, NamingAsyncOptions } from './interfaces';
+import { NamingAsyncOptions, NamingOptions } from './interfaces';
+import { NacosNamingService } from './naming.service';
 
 @Global()
 @Module({})

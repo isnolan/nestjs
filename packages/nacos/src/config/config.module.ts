@@ -1,7 +1,8 @@
-import { Global, Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
+
 import { NacosConfigService } from './config.service';
 import { CONFIG_OPTION } from './constants';
-import { ConfigOptions, ConfigAsyncOptions } from './interfaces';
+import { ConfigAsyncOptions, ConfigOptions } from './interfaces';
 
 @Global()
 @Module({})
