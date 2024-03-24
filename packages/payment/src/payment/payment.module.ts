@@ -1,6 +1,5 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 
-import { PaymentDispatcherService } from './dispatcher.service';
 import { PaymentConfigFactory, PaymentModuleAsyncOptions, PaymentModuleOptions } from './interface';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
@@ -12,7 +11,7 @@ export class PaymentModule {
     return {
       module: PaymentModule,
       controllers: [PaymentController],
-      providers: [{ provide: 'PAYMENT_CONFIG', useValue: config }, PaymentService, PaymentDispatcherService],
+      providers: [{ provide: 'PAYMENT_CONFIG', useValue: config }, PaymentService],
       exports: [PaymentService],
     };
   }
@@ -22,7 +21,7 @@ export class PaymentModule {
       module: PaymentModule,
       imports: options.imports || [],
       controllers: [PaymentController],
-      providers: [this.createAsyncProviders(options), PaymentService, PaymentDispatcherService],
+      providers: [this.createAsyncProviders(options), PaymentService],
       exports: [PaymentService],
     };
   }

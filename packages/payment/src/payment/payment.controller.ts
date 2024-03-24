@@ -1,9 +1,7 @@
-// src/payment/payment.controller.ts
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-
-import { PaymentDispatcherService } from './dispatcher.service';
 import { AppleWebhookGuard, GoogleWebhookGuard, StripeWebhookGuard } from './guards';
+import { PaymentService } from './payment.service';
 
 export interface RequestWithEvent extends Request {
   event: any;
@@ -11,18 +9,13 @@ export interface RequestWithEvent extends Request {
 
 @Controller('notify')
 export class PaymentController {
-  constructor(private eventDispatcher: PaymentDispatcherService) {}
-
-  @Get('stripe')
-  async test() {
-    return 'success';
-  }
+  constructor(private service: PaymentService) {}
 
   @Post('stripe')
   @UseGuards(StripeWebhookGuard)
   async handleStripe(@Req() request: RequestWithEvent) {
     const { event } = request;
-    await this.eventDispatcher.dispatchEvent('stripe', event.type, event);
+    await this.service.dispatchEvent('stripe', event.type, event);
   }
 
   @Post('google')
