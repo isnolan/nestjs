@@ -1,10 +1,39 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import Stripe from 'stripe';
 
 @Injectable()
 export class StripeWebhookGuard implements CanActivate {
+  private stripe: Stripe;
+
+  constructor(
+    @Inject('PAYMENT_CONFIG')
+    private readonly config,
+  ) {
+    this.stripe = new Stripe(this.config?.stripe?.apiSecretKey, { apiVersion: '2023-10-16' });
+  }
+
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    // 实现Stripe签名验证逻辑
-    return true; // 或者在验证失败时返回false
+    const request: Request = context.switchToHttp().getRequest();
+    const signature = request.headers['stripe-signature'];
+
+    // 从环境变量获取Stripe Webhook Secret
+    const { webhookSecret } = this.config?.stripe;
+
+    if (!signature || !webhookSecret) {
+      throw new UnauthorizedException('Missing Stripe signature or webhook secret.');
+    }
+
+    try {
+      // 使用Stripe库来构建事件，这将验证签名
+      const event = this.stripe.webhooks.constructEvent(request['rawBody'], signature, webhookSecret);
+
+      // 将验证后的事件附加到request对象，以便后续使用
+      (request as any).event = event;
+
+      console.log(`->`, 'authed');
+      return true;
+    } catch (err) {
+      throw new UnauthorizedException(`Stripe webhook error: ${err.message}`);
+    }
   }
 }
