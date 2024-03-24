@@ -16,6 +16,7 @@ dist
 certs
 
 # bundle
+.tsbuildinfo
 packages/**/*.d.ts
 packages/**/*.js
 

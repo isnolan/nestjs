@@ -1,6 +1,7 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 
 import { SubscriptionConfigFactory, SubscriptionModuleAsyncOptions, SubscriptionModuleOptions } from './interface';
+import Providers from './provider';
 import { SubscriptionController } from './subscription.controller';
 import { SubscriptionService } from './subscription.service';
 
@@ -11,7 +12,7 @@ export class SubscriptionModule {
     return {
       module: SubscriptionModule,
       controllers: [SubscriptionController],
-      providers: [{ provide: 'PAYMENT_CONFIG', useValue: config }, SubscriptionService],
+      providers: [{ provide: 'PAYMENT_CONFIG', useValue: config }, SubscriptionService, ...Providers],
       exports: [SubscriptionService],
     };
   }
@@ -21,7 +22,7 @@ export class SubscriptionModule {
       module: SubscriptionModule,
       imports: options.imports || [],
       controllers: [SubscriptionController],
-      providers: [this.createAsyncProviders(options), SubscriptionService],
+      providers: [this.createAsyncProviders(options), SubscriptionService, ...Providers],
       exports: [SubscriptionService],
     };
   }

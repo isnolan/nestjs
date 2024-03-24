@@ -13,6 +13,9 @@ export interface SubscriptionModuleOptions {
     projectId: string;
   };
   apple?: {
+    signingKey: string;
+    keyId: string;
+    issuerId: string;
     bundleId: string;
     environment: 'Sandbox' | 'Production';
   };

@@ -21,7 +21,7 @@ import { NotificationType } from './constant';
  * https://www.wuguozhang.com/archives/54/comment-page-1
  */
 @Injectable()
-export class ProviderGoogleService {
+export class GoogleProviderService {
   // private readonly credentials = JSON.parse(fs.readFileSync('./certs/chatonce-service-web.json', 'utf8'));
   private readonly oauth2Client: Auth.OAuth2Client;
   private readonly packageName = 'ai.draftai.app.chatonce';
