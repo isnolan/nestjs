@@ -20,12 +20,12 @@
 
     /* Experimental Options */
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": false,
+    "emitDecoratorMetadata": true,
 
     /* Module Resolution Options */
     "baseUrl": ".", // This must be specified if "paths" is.
     "paths": {
-      "*": ["packages/*", "apps/*"]
+      "*": ["packages/*", "apps/*", "demos/*"]
     },
 
     /* Additional Options */

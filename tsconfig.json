@@ -15,10 +15,10 @@
     "outDir": "dist",
     "lib": ["es7"],
     "paths": {
-      "@yhostc/nest-nacos": ["./packages/nacos"],
-      "@yhostc/example": ["./packages/example"]
+      "@isnolan/nestjs-nacos": ["./packages/nacos"],
+      "@isnolan/nestjs-payment": ["./packages/payment"],
     }
   },
-  "include": ["packages/**/*"],
+  "include": ["packages/**/*", "demos/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

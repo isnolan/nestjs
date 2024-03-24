@@ -1,7 +1,6 @@
 {
   "name": "nestjs",
   "version": "0.0.1",
-  "private": true,
   "description": "A collection of Bodhi modules and utilities to help you level up your NestJS application.",
   "scripts": {
     "build": "turbo run build",

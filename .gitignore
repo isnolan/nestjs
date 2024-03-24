@@ -17,7 +17,8 @@ node_modules/
 # bundle
 packages/**/*.d.ts
 packages/**/*.js
-
+dist
 
 # example
 # packages/example
+stripe
