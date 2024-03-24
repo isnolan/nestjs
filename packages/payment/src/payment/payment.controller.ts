@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, UseGuards } from '@nestjs/common';
 
 import { AppleWebhookGuard, GoogleWebhookGuard, StripeWebhookGuard } from './guards';
 import { PaymentService } from './payment.service';
@@ -20,13 +20,15 @@ export class PaymentController {
 
   @Post('google')
   @UseGuards(GoogleWebhookGuard)
-  handleGooglePay(@Body() body: any) {
-    // 处理Google Pay事件
+  async handleGooglePay(@Req() request: RequestWithEvent) {
+    const { event } = request;
+    await this.service.dispatchEvent('google', event.type, event);
   }
 
   @Post('apple')
   @UseGuards(AppleWebhookGuard)
-  handleApplePay(@Body() body: any) {
-    // 处理Apple Pay事件
+  async handleApplePay(@Req() request: RequestWithEvent) {
+    const { event } = request;
+    await this.service.dispatchEvent('apple', event.type, event);
   }
 }

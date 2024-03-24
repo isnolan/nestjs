@@ -2,7 +2,7 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 
-import { ON_PAYMENT_EVENT_KEY } from './decorators/payment.decorator';
+import { ON_PAYMENT_EVENT_KEY } from './payment.decorator';
 
 @Injectable()
 export class PaymentService implements OnModuleInit, OnModuleDestroy {
