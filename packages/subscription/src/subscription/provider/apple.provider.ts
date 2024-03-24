@@ -60,11 +60,11 @@ export class AppleProviderService {
   /**
    * 申请测试通知，以验证接口是否正常
    */
-  async requestTestNotification() {
+  public async requestTestNotification() {
     return this.client.requestTestNotification();
   }
 
-  async validateWebhookSignature({ signedPayload }) {
+  public async validateWebhookSignature({ signedPayload }) {
     const notice: ResponseBodyV2DecodedPayload = await this.verifier.verifyAndDecodeNotification(signedPayload);
     console.log(`[subscription]apple`, notice);
     // 筛选需要的事件，转化为统一返回格式。

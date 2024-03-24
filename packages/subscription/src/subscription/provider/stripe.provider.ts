@@ -5,10 +5,7 @@ import Stripe from 'stripe';
 export class StripeProviderService {
   private stripe: Stripe;
 
-  constructor(
-    @Inject('CONFIG')
-    private readonly config,
-  ) {
+  constructor(@Inject('CONFIG') private readonly config) {
     if (!this.config.stripe) {
       console.warn(`[subscription]stripe, no stripe config, skip stripe provider.`);
       return;
@@ -16,7 +13,7 @@ export class StripeProviderService {
     this.stripe = new Stripe(this.config?.stripe?.apiSecretKey, { apiVersion: '2023-10-16' });
   }
 
-  async validateWebhookSignature(signature: string, rawBody: string) {
+  public async validateWebhookSignature(signature: string, rawBody: string) {
     if (!this.stripe) {
       throw new Error('[subscription]Stripe is not configured.');
     }
