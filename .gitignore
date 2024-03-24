@@ -12,12 +12,13 @@ node_modules/
 /index.js
 /index.d.ts
 .idea
-
+dist
+certs
 
 # bundle
 packages/**/*.d.ts
 packages/**/*.js
-dist
+
 
 # example
 # packages/example

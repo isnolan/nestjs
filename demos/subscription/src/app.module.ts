@@ -1,4 +1,4 @@
-import { PaymentModule } from '@isnolan/nestjs-payment';
+import { SubscriptionModule } from '@isnolan/nestjs-subscription';
 import { Module } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
@@ -7,7 +7,7 @@ dotenv.config();
 
 @Module({
   imports: [
-    PaymentModule.forRoot({
+    SubscriptionModule.forRoot({
       stripe: {
         apiSecretKey: `${process.env.STRIPE_SECRET_KEY}`,
         webhookSecret: `${process.env.STRIPE_SECRET_WEBHOOK}`,

@@ -21,11 +21,15 @@
     /* Experimental Options */
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    
+    "allowSyntheticDefaultImports": true,
 
     /* Module Resolution Options */
     "baseUrl": ".", // This must be specified if "paths" is.
     "paths": {
-      "*": ["packages/*", "apps/*", "demos/*"]
+      "*": ["packages/*", "apps/*", "demos/*"],
+      "@isnolan/nestjs-nacos": ["./packages/nacos"],
+      "@isnolan/nestjs-subscription": ["./packages/subscription"],
     },
 
     /* Additional Options */

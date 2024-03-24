@@ -1,5 +1,5 @@
 {
-  "name": "@isnolan/nestjs-payment",
+  "name": "@isnolan/nestjs-subscription",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -20,11 +20,14 @@
     "dist"
   ],
   "peerDependencies": {
+    "@apple/app-store-server-library": "^1.1.0",
     "@nestjs/common": "^10.3.5",
     "@nestjs/core": "^10.3.5",
+    "googleapis": "^134.0.0",
     "stripe": "^14.19.0"
   },
   "devDependencies": {
+    "@apple/app-store-server-library": "^1.1.0",
     "@nestjs/common": "^10.3.5",
     "@nestjs/core": "^10.3.5",
     "@swc/core": "^1.4.8",

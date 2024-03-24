@@ -2,10 +2,10 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 
-import { ON_PAYMENT_EVENT_KEY } from './payment.decorator';
+import { ON_PAYMENT_EVENT_KEY } from './subscription.decorator';
 
 @Injectable()
-export class PaymentService implements OnModuleInit, OnModuleDestroy {
+export class SubscriptionService implements OnModuleInit, OnModuleDestroy {
   private readonly eventHandlersMap = new Map<string, any[]>();
 
   constructor(private readonly modulesContainer: ModulesContainer) {}

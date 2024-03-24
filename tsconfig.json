@@ -16,7 +16,7 @@
     "lib": ["es7"],
     "paths": {
       "@isnolan/nestjs-nacos": ["./packages/nacos"],
-      "@isnolan/nestjs-payment": ["./packages/payment"],
+      "@isnolan/nestjs-subscription": ["./packages/subscription"],
     }
   },
   "include": ["packages/**/*", "demos/**/*"],
