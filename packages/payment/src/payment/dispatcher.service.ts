@@ -46,18 +46,20 @@ export class PaymentDispatcherService implements OnModuleInit, OnModuleDestroy {
   }
 
   dispatchEvent(platform: string, event: string, data: any) {
-    const handlers = this.eventHandlersMap.get(`${platform}:${event}`);
-    if (!handlers) {
-      console.warn(`No event handlers for ${platform}:${event}`);
-      return;
-    }
-    handlers.forEach((handler) => {
-      try {
-        handler(data);
-      } catch (error) {
-        console.error(`Error executing handler for ${platform}:${event}`, error);
-      }
-    });
+    const specificHandlers = this.eventHandlersMap.get(`${platform}:${event}`) || [];
+    const allEventHandlers = this.eventHandlersMap.get('all:all') || [];
+    const allPlatformSpecificEventHandlers = this.eventHandlersMap.get(`all:${event}`) || [];
+    const platformAllEventHandlers = this.eventHandlersMap.get(`${platform}:all`) || [];
+
+    // 合并所有匹配的处理器
+    const handlers = [
+      ...specificHandlers,
+      ...allPlatformSpecificEventHandlers,
+      ...platformAllEventHandlers,
+      ...allEventHandlers,
+    ];
+
+    handlers.forEach((handler) => handler(data));
   }
 
   async onModuleDestroy() {

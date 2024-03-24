@@ -25,12 +25,12 @@ export class StripeWebhookGuard implements CanActivate {
 
     try {
       // 使用Stripe库来构建事件，这将验证签名
-      const event = this.stripe.webhooks.constructEvent(request['rawBody'], signature, webhookSecret);
+      const rawBody = request[this.config.rawBodyKey || 'rawBody'];
+      const event = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
 
       // 将验证后的事件附加到request对象，以便后续使用
       (request as any).event = event;
 
-      console.log(`->`, 'authed');
       return true;
     } catch (err) {
       throw new UnauthorizedException(`Stripe webhook error: ${err.message}`);

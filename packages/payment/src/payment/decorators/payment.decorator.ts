@@ -3,7 +3,7 @@ import { SetMetadata } from '@nestjs/common';
 export const ON_PAYMENT_EVENT_KEY = 'onPaymentEvent';
 
 export interface PaymentEventOptions {
-  platform: 'apple' | 'google' | 'stripe';
+  platform: 'apple' | 'google' | 'stripe' | 'all';
   event: string;
 }
 

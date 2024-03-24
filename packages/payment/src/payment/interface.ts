@@ -1,6 +1,8 @@
 import { Type } from '@nestjs/common';
+import { Request } from 'express';
 
 export interface PaymentModuleOptions {
+  rawBodyKey?: 'rawBody';
   stripe?: {
     apiSecretKey: string;
     webhookSecret: string;
