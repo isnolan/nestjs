@@ -1,11 +1,11 @@
 {
   "name": "@isnolan/nestjs-subscription",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "",
   "keywords": [],
   "scripts": {
     "build": "tsup --watch",
-    "pub": "tsup && pnpm publish --access public"
+    "pub": "tsup && pnpm publish --access public --no-git-checks"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -23,8 +23,8 @@
   "peerDependencies": {
     "@apple/app-store-server-library": "^1.1.0",
     "moment-timezone": "^0.5.45",
-    "@nestjs/common": "^10.3.5",
-    "@nestjs/core": "^10.3.5",
+    "@nestjs/common": "^10.3.2",
+    "@nestjs/core": "^10.3.2",
     "googleapis": "^134.0.0",
     "stripe": "^14.19.0"
   },

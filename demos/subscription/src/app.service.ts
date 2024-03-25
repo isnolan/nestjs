@@ -1,8 +1,9 @@
-import { OnSubscriptionEvent } from '@isnolan/nestjs-subscription';
+import { OnSubscriptionEvent, StripeProviderService } from '@isnolan/nestjs-subscription';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
+  constructor(private readonly stripe: StripeProviderService) {}
   // @OnSubscriptionEvent({ platform: 'all', event: 'all' })
   // @OnSubscriptionEvent({ platform: 'all', event: 'invoice.paid' })
   @OnSubscriptionEvent({ platform: 'stripe', event: 'all' })
