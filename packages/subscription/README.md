@@ -57,7 +57,6 @@ import { SubscriptionModule } from '@isnolan/nestjs-subscription';
       },
     }),
   ],
-
   providers: [AppService],
 })
 export class AppModule {}
@@ -68,7 +67,9 @@ export class AppModule {}
 SubscriptionModule also supports asynchronous configuration, which is useful when the configuration needs to be dynamically determined at runtime.
 
 ```typescript
+
 import { SubscriptionModule } from '@isnolan/nestjs-subscription';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -77,7 +78,6 @@ import { SubscriptionModule } from '@isnolan/nestjs-subscription';
       useFactory: async (config: ConfigService) => config.get('subscription'),
     }),
   ],
-
   providers: [AppService],
 })
 export class AppModule {}
@@ -98,6 +98,27 @@ The webhooks url is
 > https://api.xxxx.com/v1/notify/stripe
 
 Follow the instructions from the [Stripe Documentation](https://stripe.com/docs/webhooks) for remaining integration steps such as testing your integration with the CLI before you go live and properly configuring the endpoint from the Stripe dashboard so that the correct events are sent to your NestJS app.
+
+
+## Subscription lifetcycle
+### Event
+| 事件生命周期     | Apple Pay                | Google Pay                  | Stripe                    |
+|----------------|--------------------------|-----------------------------|---------------------------|
+| 订阅创建       | subscription_created     | SUBSCRIPTION_STATE_PENDING      | customer.subscription.created |
+| 订阅付款       | subscription_renewed     | SUBSCRIPTION_RENEWED        | customer.subscription.updated |
+| 订阅取消       | subscription_canceled    | SUBSCRIPTION_CANCELED       | customer.subscription.deleted |
+| 订阅过期       | subscription_expired     | SUBSCRIPTION_EXPIRED        | customer.subscription.expired |
+| 付款成功       | payment_success          | PAYMENT_SUCCESS             | invoice.payment_succeeded  |
+| 付款失败       | payment_failed           | PAYMENT_FAILED              | invoice.payment_failed     |
+
+### State
+| State          | Apple Pay                | Google Pay                  | Stripe                    |
+|----------------|--------------------------|-----------------------------|---------------------------|
+| PENDING         | INITIAL_BUY     | SUBSCRIPTION_STATE_PENDING | customer.subscription.created |
+| Active         | subscription_created      | SUBSCRIPTION_STATE_ACTIVE | customer.subscription.created |
+| Paused         | subscription_created      | SUBSCRIPTION_STATE_ON_HOLD | customer.subscription.created |
+| Canceled       | subscription_created      | SUBSCRIPTION_STATE_CANCELED | customer.subscription.created |
+| Expired        | subscription_created      | SUBSCRIPTION_STATE_EXPIRED | customer.subscription.created |
 
 ## Contribute
 

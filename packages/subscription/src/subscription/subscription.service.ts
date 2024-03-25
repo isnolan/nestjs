@@ -66,4 +66,16 @@ export class SubscriptionService implements OnModuleInit {
 
     handlers.forEach((handler) => handler(data));
   }
+
+  async validateReceipt(platform: string, receipt: string) {
+    if (platform === 'apple') {
+      return this.apple.validateReceipt(receipt);
+    }
+
+    if (platform === 'google') {
+      return this.google.validateReceipt(receipt);
+    }
+
+    throw new Error(`Unsupported platform: ${platform}`);
+  }
 }

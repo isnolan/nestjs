@@ -9,9 +9,8 @@ export namespace subscription {
     };
     google?: {
       packageName: string;
-      serviceAccountEmail: string;
+      clientEmail: string;
       privateKey: string;
-      projectId: string;
     };
     apple?: {
       signingKey: string;
@@ -34,35 +33,42 @@ export namespace subscription {
     createSubscriptionConfig(): Promise<Options> | Options;
   }
 
-  export interface Notice {
-    notice_type: string;
-    notice_id: string;
-    notice_time: string;
+  /**
+   * 订阅活动类型
+   */
+  export enum NoticeType {
+    SUBSCRIBED = 'SUBSCRIBED',
+    RENEWED = 'RENEWED',
+    GRACE_PERIOD = 'GRACE_PERIOD',
+    EXPIRED = 'EXPIRED',
+    CANCELLED = 'CANCELLED',
+    DEFERRED = 'DEFERRED',
+    REFUND = 'REFUND',
+    REVOKED = 'REVOKED',
+    CHANGED = 'CHANGED',
+    OTHER = 'OTHER',
+  }
 
-    // provider
-    provider: 'google' | 'apple' | 'stripe';
+  export type SubscriptionState = 'ACTIVE' | 'GRACE' | 'EXPIRED' | 'CANCELLED';
 
-    // 订阅信息
-    subscription: {
-      id: string;
-      product_id: string;
-      start_time: string;
-      expire_time: string;
-      state: string; // 订阅状态
-      auto_renew: number; // 是否续订
-    };
-
-    // 交易信息
-    transaction: {
-      id: string;
-      price: number;
-      region: string;
+  export interface Subscription {
+    platform: 'Google' | 'Apple' | 'Stripe';
+    subscriptionId: string;
+    productId: string;
+    startTime: string;
+    expireTime: string;
+    state: SubscriptionState; // 订阅状态
+    billing: {
+      transactionId: string;
+      regionCode: string;
       currency: string;
+      price: number;
     };
-
-    // 应用信息
-    app: {
-      package_name: string;
-    };
+    isAutoRenew: 0 | 1; // 是否续订
+  }
+  export interface Notice {
+    type: string;
+    noticeId: string;
+    subscription: Subscription;
   }
 }

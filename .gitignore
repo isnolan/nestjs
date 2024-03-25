@@ -23,5 +23,4 @@ packages/**/*.js
 
 # example
 # packages/example
-stripe
 notify
