@@ -46,6 +46,7 @@ export namespace subscription {
     REFUND = 'REFUND',
     REVOKED = 'REVOKED',
     CHANGED = 'CHANGED',
+    TEST = 'TEST',
     OTHER = 'OTHER',
   }
 

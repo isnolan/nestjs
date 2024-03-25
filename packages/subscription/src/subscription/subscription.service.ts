@@ -4,6 +4,7 @@ import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 
 import { AppleProviderService, GoogleProviderService } from './provider';
 import { ON_EVENT_KEY } from './subscription.decorator';
+import { subscription } from './types';
 
 @Injectable()
 export class SubscriptionService implements OnModuleInit {
@@ -67,12 +68,12 @@ export class SubscriptionService implements OnModuleInit {
     handlers.forEach((handler) => handler(data));
   }
 
-  async validateReceipt(platform: string, receipt: string) {
-    if (platform === 'apple') {
+  async validateReceipt(platform: string, receipt: string): Promise<subscription.Subscription> {
+    if (platform === 'Apple') {
       return this.apple.validateReceipt(receipt);
     }
 
-    if (platform === 'google') {
+    if (platform === 'Google') {
       return this.google.validateReceipt(receipt);
     }
 

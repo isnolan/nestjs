@@ -65,16 +65,23 @@ export class AppleProviderService {
 
   public async validateWebhookSignature({ signedPayload }): Promise<subscription.Notice> {
     const notice: ResponseBodyV2DecodedPayload = await this.verifier.verifyAndDecodeNotification(signedPayload);
-    const transactionInfo = await this.validateReceipt(notice.data.signedTransactionInfo);
-    const renewalInfo = await this.verifier.verifyAndDecodeRenewalInfo(notice.data.signedRenewalInfo);
-    Object.assign(notice.data, { transactionInfo, renewalInfo });
-    delete notice.data.signedTransactionInfo;
-    delete notice.data.signedRenewalInfo;
+    let subscription: subscription.Subscription;
+    if (notice.data.signedTransactionInfo) {
+      const transactionInfo = await this.validateReceipt(notice.data.signedTransactionInfo);
+      Object.assign(notice.data, { transactionInfo });
+      // delete notice.data.signedTransactionInfo;
+      subscription = transactionInfo;
+    }
+    if (notice.data.signedRenewalInfo) {
+      const renewalInfo = await this.verifier.verifyAndDecodeRenewalInfo(notice.data.signedRenewalInfo);
+      Object.assign(notice.data, { renewalInfo });
+      // delete notice.data.signedRenewalInfo;
+    }
 
     return {
       type: this.formatNotificationType(notice.notificationType, notice.subtype),
       noticeId: notice.notificationUUID as string,
-      subscription: transactionInfo,
+      subscription,
     };
   }
 
@@ -147,6 +154,10 @@ export class AppleProviderService {
     // Case: 9. 订阅升/降级 CHANGED 生成新订单和交易记录
     if (type === 'DID_CHANGE_RENEWAL_PREF' && ['UPGRADE', 'DOWNGRADE'].includes(subType)) {
       return subscription.NoticeType.CHANGED;
+    }
+
+    if (type === 'TEST') {
+      return subscription.NoticeType.TEST;
     }
     // Default case for unmapped notifications
     // return `[Unsupport]${type}:${subType}`;
