@@ -1,14 +1,19 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 
-import { ON_PAYMENT_EVENT_KEY } from './subscription.decorator';
+import { AppleProviderService, GoogleProviderService } from './provider';
+import { ON_EVENT_KEY } from './subscription.decorator';
 
 @Injectable()
-export class SubscriptionService implements OnModuleInit, OnModuleDestroy {
+export class SubscriptionService implements OnModuleInit {
   private readonly eventHandlersMap = new Map<string, any[]>();
 
-  constructor(private readonly modulesContainer: ModulesContainer) {}
+  constructor(
+    private readonly google: GoogleProviderService,
+    private readonly apple: AppleProviderService,
+    private readonly modulesContainer: ModulesContainer,
+  ) {}
 
   onModuleInit() {
     // 在模块初始化时扫描所有使用 @OnPaymentEvent 的方法，并填充 eventHandlersMap
@@ -33,7 +38,7 @@ export class SubscriptionService implements OnModuleInit, OnModuleDestroy {
       })
       .forEach((method) => {
         const handler = instance[method];
-        const metadata = Reflect.getMetadata(ON_PAYMENT_EVENT_KEY, handler);
+        const metadata = Reflect.getMetadata(ON_EVENT_KEY, handler);
         if (metadata) {
           const { platform, event } = metadata;
           const key = `${platform}:${event}`;
@@ -62,7 +67,12 @@ export class SubscriptionService implements OnModuleInit, OnModuleDestroy {
     handlers.forEach((handler) => handler(data));
   }
 
-  async onModuleDestroy() {
-    //
+  validateReceipt(platform: string, receipt: any) {
+    // if (platform === 'google') {
+    //   return this.google.validateReceipt(receipt);
+    // }
+    // if (platform === 'apple') {
+    //   return this.apple.validateReceipt(receipt);
+    // }
   }
 }

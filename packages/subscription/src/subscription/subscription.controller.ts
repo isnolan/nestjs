@@ -15,20 +15,22 @@ export class SubscriptionController {
   @UseGuards(StripeGuard)
   async handleStripe(@Req() request: RequestWithEvent) {
     const { event } = request;
-    await this.service.dispatchEvent('stripe', event.type, event);
+
+    this.service.dispatchEvent('stripe', event.type, event);
   }
 
   @Post('apple')
   @UseGuards(AppleGuard)
   async handleApplePay(@Req() request: RequestWithEvent) {
-    const { event } = request;
-    await this.service.dispatchEvent('apple', event.notificationType, event);
+    const { event, body } = request;
+
+    this.service.dispatchEvent('apple', event.notificationType, event);
   }
 
   @Post('google')
   @UseGuards(GoogleGuard)
   async handleGooglePay(@Req() request: RequestWithEvent) {
-    const { event } = request;
-    await this.service.dispatchEvent('google', event.type, event);
+    const { body, event } = request;
+    this.service.dispatchEvent('google', event.type, event);
   }
 }

@@ -1,10 +1,24 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+
+import { GoogleProviderService } from '../provider';
+import { BaseGuard } from './base.guard';
 
 @Injectable()
-export class GoogleGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+export class GoogleGuard extends BaseGuard implements CanActivate {
+  constructor(private readonly provider: GoogleProviderService) {
+    super();
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    // 实现Stripe签名验证逻辑
-    return true; // 或者在验证失败时返回false
+
+    try {
+      // 实现Stripe签名验证逻辑
+      // this.save('google', request.body, event);
+      return true;
+    } catch (err) {
+      // this.save('apple', request.body, { error: err.message });
+      throw new UnauthorizedException(`Google webhook error: ${err.message}`);
+    }
   }
 }

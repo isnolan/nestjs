@@ -4,7 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import fs from 'fs';
 import path from 'path';
 
-import type { SubscriptionModuleOptions } from '@/subscription/interface';
+import type { subscription } from '../types';
 
 @Injectable()
 export class AppleProviderService {
@@ -14,7 +14,7 @@ export class AppleProviderService {
 
   constructor(
     @Inject('CONFIG')
-    private readonly config: SubscriptionModuleOptions,
+    private readonly config: subscription.Options,
   ) {
     if (!this.config.apple) {
       console.warn(`[subscription]apple, no config, skip stripe provider.`);
