@@ -34,26 +34,35 @@ export namespace subscription {
     createSubscriptionConfig(): Promise<Options> | Options;
   }
 
-  export interface Notification {
-    platform: 'google' | 'apple' | 'stripe';
-    type: string;
+  export interface Notice {
+    notice_type: string;
+    notice_id: string;
+    notice_time: string;
+
+    // provider
+    provider: 'google' | 'apple' | 'stripe';
+
     // 订阅信息
     subscription: {
-      // plan
+      id: string;
       product_id: string;
       start_time: string;
       expire_time: string;
-      is_renewing: boolean;
       state: string; // 订阅状态
-
-      // transaction
-      subscription_id: string;
-      transaction_id: string;
-      price_amount: number;
-      region_code: string;
-      currency: string;
+      auto_renew: number; // 是否续订
     };
 
     // 交易信息
+    transaction: {
+      id: string;
+      price: number;
+      region: string;
+      currency: string;
+    };
+
+    // 应用信息
+    app: {
+      package_name: string;
+    };
   }
 }

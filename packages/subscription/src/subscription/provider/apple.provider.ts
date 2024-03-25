@@ -71,4 +71,40 @@ export class AppleProviderService {
     // // const  signedTransactionInfo, signedRenewalInfo } = notice.data;
     return notice;
   }
+
+  public async validateReceipt(purchaseToken: string) {
+    const trans = await this.verifier.verifyAndDecodeTransaction(purchaseToken);
+    console.log(`->trans`, trans);
+
+    return {
+      // 应用消息
+      bundleId: trans.bundleId,
+      environment: trans.environment === 'Sandbox' ? 'Sandbox' : 'Production',
+      // channel: 'AppleStore',
+
+      // 订阅信息
+      productId: trans.productId,
+      groupId: trans.subscriptionGroupIdentifier,
+      startTime: new Date(trans.purchaseDate).toISOString(),
+      expireTime: new Date(trans.expiresDate).toISOString(),
+      state: this.formatSubscriptionState('', trans.expiresDate),
+
+      // 交易信息
+      billing: {
+        transactionId: trans.transactionId,
+        priceRegionCode: trans.storefront,
+        priceCurrency: trans.currency || '',
+        priceAmount: trans.price || 0,
+        ownershipType: trans.inAppOwnershipType,
+        // ownershipId: trans?.deviceVerificationNonce,
+      },
+      // 续约信息
+      renewal: {
+        transactionId: trans.originalTransactionId,
+        productId: trans.productId,
+        autoRenewStatus: 1,
+        renewalDate: new Date(trans.expiresDate).toISOString(),
+      },
+    };
+  }
 }

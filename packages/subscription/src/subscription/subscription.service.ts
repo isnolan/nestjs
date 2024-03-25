@@ -66,13 +66,4 @@ export class SubscriptionService implements OnModuleInit {
 
     handlers.forEach((handler) => handler(data));
   }
-
-  validateReceipt(platform: string, receipt: any) {
-    // if (platform === 'google') {
-    //   return this.google.validateReceipt(receipt);
-    // }
-    // if (platform === 'apple') {
-    //   return this.apple.validateReceipt(receipt);
-    // }
-  }
 }
