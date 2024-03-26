@@ -69,7 +69,8 @@ export namespace subscription {
   }
   export interface Notice {
     type: string;
-    noticeId: string;
-    subscription: Subscription;
+    id: string;
+    payload: any;
+    subscription?: Subscription;
   }
 }

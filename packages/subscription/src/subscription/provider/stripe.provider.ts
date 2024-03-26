@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 
-import type { stripe } from '../types';
+import { stripe, subscription } from '../types';
 
 @Injectable()
 export class StripeProviderService {
@@ -15,12 +15,14 @@ export class StripeProviderService {
     this.stripe = new Stripe(this.config?.stripe?.apiSecretKey, { apiVersion: '2023-10-16' });
   }
 
-  public async validateWebhookSignature(signature: string, rawBody: string) {
+  public async validateWebhookSignature(signature: string, rawBody: string): Promise<subscription.WebhookDto> {
     if (!this.stripe) {
       throw new Error('[subscription]Stripe is not configured.');
     }
     const { webhookSecret } = this.config.stripe;
-    return this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    const { type, id, ...payload } = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    //
+    return { type, id, payload: payload, subscription: {} };
   }
 
   async createCheckouSession(opts: stripe.createCheckouDto) {

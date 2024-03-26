@@ -66,21 +66,22 @@ export class AppleProviderService {
   public async validateWebhookSignature({ signedPayload }): Promise<subscription.Notice> {
     const notice: ResponseBodyV2DecodedPayload = await this.verifier.verifyAndDecodeNotification(signedPayload);
     let subscription: subscription.Subscription;
-    if (notice.data.signedTransactionInfo) {
+    if (notice.data?.signedTransactionInfo) {
       const transactionInfo = await this.validateReceipt(notice.data.signedTransactionInfo);
       Object.assign(notice.data, { transactionInfo });
       // delete notice.data.signedTransactionInfo;
       subscription = transactionInfo;
     }
-    if (notice.data.signedRenewalInfo) {
+    if (notice.data?.signedRenewalInfo) {
       const renewalInfo = await this.verifier.verifyAndDecodeRenewalInfo(notice.data.signedRenewalInfo);
       Object.assign(notice.data, { renewalInfo });
       // delete notice.data.signedRenewalInfo;
     }
 
     return {
-      type: this.formatNotificationType(notice.notificationType, notice.subtype),
-      noticeId: notice.notificationUUID as string,
+      type: this.formatNotificationType(notice.notificationType, notice.notificationType),
+      id: notice.notificationUUID,
+      payload: notice,
       subscription,
     };
   }

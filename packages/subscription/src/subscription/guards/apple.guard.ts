@@ -1,7 +1,16 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import fs from 'fs';
+import moment from 'moment-timezone';
 
 import { AppleProviderService } from '../provider';
-import { BaseGuard } from './base.guard';
+
+export class BaseGuard {
+  protected async save(platform: string, notice: any) {
+    const time = moment().tz('Asia/Shanghai').format('YYMMDDHHmmssSSS');
+    !fs.existsSync('./notify') && fs.mkdirSync('./notify');
+    fs.writeFileSync(`./notify/${time}_${platform}.json`, JSON.stringify(notice, null, 2));
+  }
+}
 
 @Injectable()
 export class AppleGuard extends BaseGuard implements CanActivate {
@@ -13,12 +22,12 @@ export class AppleGuard extends BaseGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     try {
-      const event = await this.provider.validateWebhookSignature(request.body);
-      (request as any).event = event;
-      this.save('apple', request.body, event);
+      const notice = await this.provider.validateWebhookSignature(request.body);
+      (request as any).notice = notice;
+      this.save('apple', notice);
       return true;
     } catch (err) {
-      this.save('apple', request.body, { error: err.message });
+      this.save('apple', { error: err.message });
       throw new UnauthorizedException(`Apple webhook error: ${err.message}`);
     }
   }

@@ -1,6 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
+import fs from 'fs';
+import moment from 'moment-timezone';
 
 import { AppleProviderService, GoogleProviderService } from './provider';
 import { ON_EVENT_KEY } from './subscription.decorator';
@@ -69,13 +71,18 @@ export class SubscriptionService implements OnModuleInit {
   }
 
   async validateReceipt(platform: string, receipt: string): Promise<subscription.Subscription> {
+    const time = moment().tz('Asia/Shanghai').format('YYMMDDHHmmssSSS');
+    let notice: subscription.Subscription;
     if (platform === 'Apple') {
-      return this.apple.validateReceipt(receipt);
+      notice = await this.apple.validateReceipt(receipt);
     }
 
     if (platform === 'Google') {
-      return this.google.validateReceipt(receipt);
+      notice = await this.google.validateReceipt(receipt);
     }
+
+    !fs.existsSync('./notify') && fs.mkdirSync('./notify');
+    fs.writeFileSync(`./notify/${time}_${platform}.json`, JSON.stringify({ receipt, notice }, null, 2));
 
     throw new Error(`Unsupported platform: ${platform}`);
   }

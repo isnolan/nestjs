@@ -50,7 +50,8 @@ export class GoogleProviderService {
       const { purchaseToken, notificationType } = notice.subscriptionNotification;
       return {
         type: this.formatNoticeType(notificationType),
-        noticeId: message.messageId as string,
+        id: message.messageId as string,
+        payload: notice,
         subscription: await this.validateReceipt(purchaseToken),
       };
     }
