@@ -76,14 +76,14 @@ export class GoogleProviderService {
   private formatSubscriptionState(state: string): subscription.State {
     switch (state) {
       case 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD':
-        return 'PAUSED';
+        return 'Paused';
       case 'SUBSCRIPTION_STATE_CANCELED':
-        return 'CANCELLED';
+        return 'Cancelled';
       case 'SUBSCRIPTION_STATE_ON_HOLD':
       case 'SUBSCRIPTION_STATE_EXPIRED':
-        return 'EXPIRED';
+        return 'Expired';
       default:
-        return 'ACTIVE';
+        return 'Active';
     }
   }
 

@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import moment from 'moment-timezone';
 import Stripe from 'stripe';
 
 import type { stripe, subscription } from '../types';
@@ -22,7 +21,7 @@ export class StripeProviderService {
     }
     const { webhookSecret } = this.config.stripe;
     const { type, id, data } = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-    const notice: subscription.Notice = { id: `${id}`, type: 'OTHER', original: data, provider: 'Stripe' };
+    const notice: subscription.Notice = { id: `${id}`, type: 'OTHER', original: { type, data }, provider: 'Stripe' };
 
     // case1: SUBSCRIBED OR RENEWED
     if (['invoice.paid'].includes(type)) {
@@ -35,13 +34,7 @@ export class StripeProviderService {
       return { ...notice, type, subscription };
     }
 
-    // case3: EXPIRED
-    if (['customer.subscription.deleted'].includes(type)) {
-      const subscription = this.formatEventBySubDeleted(data);
-      return { ...notice, type: 'EXPIRED', subscription };
-    }
-
-    // case4: Cancel
+    // case3: Cancel, at period end
     if (['customer.subscription.updated'].includes(type)) {
       const subscription = this.formatEventByCancel(data);
       if (subscription) {
@@ -49,10 +42,11 @@ export class StripeProviderService {
       }
     }
 
-    // case5: REFUND
-    // if (['invoice.payment_failed'].includes(type)) {
-    //   return { ...result, type: 'REFUND' };
-    // }
+    // case4: Cancel, at now
+    if (['customer.subscription.deleted'].includes(type)) {
+      const subscription = this.formatEventByCancel(data, true);
+      return { ...notice, type: 'CANCELLED', subscription };
+    }
 
     // Other Case
     return notice;
@@ -97,16 +91,19 @@ export class StripeProviderService {
   }
 
   // Cancelled
-  private formatEventByCancel(data: Stripe.Event.Data): subscription.Subscription | false {
-    const { id, canceled_at, current_period_start, current_period_end } = data.object as Stripe.Subscription;
-    const { cancellation_details } = data.object as Stripe.Subscription;
-
+  private formatEventByCancel(data: Stripe.Event.Data, immediate = false): subscription.Subscription | undefined {
+    const { id, canceled_at, cancellation_details, current_period_start } = data.object as Stripe.Subscription;
+    let { current_period_end } = data.object as Stripe.Subscription;
     if (canceled_at) {
+      if (immediate) {
+        current_period_end = canceled_at;
+      }
+
       return {
         subscription_id: id,
         period_start: new Date(current_period_start * 1000).toISOString(),
         period_end: new Date(current_period_end * 1000).toISOString(),
-        state: 'Active' as subscription.State,
+        state: immediate ? 'Cancelled' : 'Active',
 
         cancellation: {
           reason: cancellation_details.reason,
@@ -114,8 +111,7 @@ export class StripeProviderService {
         },
       };
     }
-
-    return false;
+    return;
   }
 
   // Expired

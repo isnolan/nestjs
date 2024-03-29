@@ -94,7 +94,7 @@ export class AppleProviderService {
       // productId: trans.productId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
-      state: 'ACTIVE', // this.formatSubscriptionState('', trans.expiresDate),
+      state: 'Active', // this.formatSubscriptionState('', trans.expiresDate),
       // 账单
       // billing: {
       //   transactionId: trans.transactionId,
