@@ -19,14 +19,16 @@ export class StripeProviderService {
     if (!this.stripe) {
       throw new Error('[subscription]Stripe is not configured.');
     }
+
     const { webhookSecret } = this.config.stripe;
     const { type, id, data } = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-    const notice: subscription.Notice = { id: `${id}`, type: 'OTHER', original: { type, data }, provider: 'Stripe' };
+    const notice: subscription.Notice = { id: id, type: 'UNHANDLED', original: { type, data }, provider: 'Stripe' };
 
     // case1: SUBSCRIBED OR RENEWED
     if (['invoice.paid'].includes(type)) {
       return this.formatEventByPaid(notice, data);
     }
+
     // case2: GRACE_PERIOD
     if (['payment_failed'].includes(type)) {
       const type = 'GRACE_PERIOD';

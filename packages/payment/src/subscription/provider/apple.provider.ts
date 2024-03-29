@@ -56,116 +56,132 @@ export class AppleProviderService {
     }
   }
 
-  /**
-   * 申请测试通知，以验证接口是否正常
-   */
   public async requestTestNotification() {
     return this.client.requestTestNotification();
-  }
-
-  public async validateWebhookSignature({ signedPayload }): Promise<subscription.Notice> {
-    const notice: ResponseBodyV2DecodedPayload = await this.verifier.verifyAndDecodeNotification(signedPayload);
-    let subscription: subscription.Subscription;
-    if (notice.data?.signedTransactionInfo) {
-      const transactionInfo = await this.validateReceipt(notice.data.signedTransactionInfo);
-      Object.assign(notice.data, { transactionInfo });
-      // delete notice.data.signedTransactionInfo;
-      subscription = transactionInfo;
-    }
-    if (notice.data?.signedRenewalInfo) {
-      const renewalInfo = await this.verifier.verifyAndDecodeRenewalInfo(notice.data.signedRenewalInfo);
-      Object.assign(notice.data, { renewalInfo });
-      // delete notice.data.signedRenewalInfo;
-    }
-
-    return {
-      type: this.formatNotificationType(notice.notificationType, notice.notificationType),
-      id: notice.notificationUUID,
-      subscription,
-      original: notice.data,
-      provider: 'Apple',
-    };
-  }
-
-  public async validateReceipt(purchaseToken: string): Promise<subscription.Subscription> {
-    const trans = await this.verifier.verifyAndDecodeTransaction(purchaseToken);
-    return {
-      subscription_id: trans.originalTransactionId,
-      // productId: trans.productId,
-      period_start: new Date(trans.purchaseDate).toISOString(),
-      period_end: new Date(trans.expiresDate).toISOString(),
-      state: 'Active', // this.formatSubscriptionState('', trans.expiresDate),
-      // 账单
-      // billing: {
-      //   transactionId: trans.transactionId,
-      //   regionCode: trans.storefront,
-      //   currency: trans.currency || '',
-      //   price: trans.price || 0,
-      // },
-      // 续订
-      // isAutoRenew: 1,
-    };
   }
 
   /**
    * 格式化通知状态
    * https://developer.apple.com/documentation/appstoreservernotifications/notificationtype
    */
-  private formatNotificationType(type: string, subType: string): subscription.NoticeType {
-    // Case: 1. 新增/重新订阅 SUBSCRIBED 生成订阅、订单和交易记录
-    if (type === 'SUBSCRIBED' && ['INITIAL_BUY', 'RESUBSCRIBE'].includes(subType)) {
-      return 'SUBSCRIBED';
-    }
+  public async validateWebhookSignature({ signedPayload }): Promise<subscription.Notice> {
+    const n: ResponseBodyV2DecodedPayload = await this.verifier.verifyAndDecodeNotification(signedPayload);
+    const { notificationUUID: id, notificationType: type, subtype } = n;
+    const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: n }, provider: 'Apple' };
 
-    // Case: 2. 续订成功/续订宽限恢复 RENEW 延长订阅记录，生成新订单和交易记录
-    if (type === 'DID_RENEW') {
-      return 'RENEWED';
-    }
+    if (n.data?.signedTransactionInfo) {
+      const transactionInfo = await this.verifier.verifyAndDecodeTransaction(n.data.signedTransactionInfo);
+      Object.assign(n.data, { transactionInfo });
 
-    // Case: 3. 续订宽限 RENEW_GRACE 标记订阅状态（宽限）
-    if (type === 'DID_FAIL_TO_RENEW' && subType === 'GRACE_PERIOD') {
-      return 'GRACE_PERIOD';
-    }
+      // case1: SUBSCRIBED OR RENEWED
+      if (type === 'SUBSCRIBED' && ['INITIAL_BUY', 'RESUBSCRIBE'].includes(subtype)) {
+        const subscription = this.formatEventBySubscribed(transactionInfo);
+        return { ...notice, type: 'SUBSCRIBED', subscription };
+      }
 
-    // Case: 4. 到期/续订宽限失败 EXPIRED 标记订阅状态（过期）
-    if (['EXPIRED', 'GRACE_PERIOD_EXPIRED'].includes(type)) {
-      return 'EXPIRED';
-    }
+      // case2: RENEWED
+      if (type === 'DID_RENEW') {
+        const subscription = this.formatEventBySubscribed(transactionInfo);
+        return { ...notice, type: 'RENEWED', subscription };
+      }
 
-    // Case: 5. 订阅取消 CANCELLED
-    if (type === 'DID_CHANGE_RENEWAL_STATUS' && subType === 'AUTO_RENEW_DISABLED') {
-      return 'CANCELLED';
-    }
+      // case3: GRACE_PERIOD
+      if (type === 'DID_FAIL_TO_RENEW' && subtype === 'GRACE_PERIOD') {
+        const subscription = this.formatEventByCommon(transactionInfo);
+        return { ...notice, type: 'GRACE_PERIOD', subscription };
+      }
 
-    // Case: 6. 续订延期 DEFERRED
-    // if ((type === 'RENEWAL_EXTENDED' || type === 'RENEWAL_EXTENSION') && subType !== 'FAILURE') {
-    //   return subscription.NoticeType.DEFERRED;
+      // case4: EXPIRED
+      if (['EXPIRED', 'GRACE_PERIOD_EXPIRED'].includes(type)) {
+        const subscription = this.formatEventByCommon(transactionInfo);
+        return { ...notice, type: 'EXPIRED', subscription };
+      }
+
+      // case5: CANCELLED
+      if (type === 'DID_CHANGE_RENEWAL_STATUS' && subtype === 'AUTO_RENEW_DISABLED') {
+        const subscription = this.formatEventByCommon(transactionInfo);
+        return { ...notice, type: 'CANCELLED', subscription };
+      }
+
+      // case6: REFUND or REVOKED
+      if (['REFUND', 'REVOKED'].includes(type)) {
+        const subscription = this.formatEventByCancel(transactionInfo);
+        return { ...notice, type: 'CANCELLED', subscription };
+      }
+    }
+    // if (n.data?.signedRenewalInfo) {
+    //   const renewalInfo = await this.verifier.verifyAndDecodeRenewalInfo(n.data.signedRenewalInfo);
+    //   Object.assign(n.data, { renewalInfo });
     // }
 
-    // Case: 7. 退款, REFUND, 生成退款单据和交易记录
-    if (type === 'REFUND') {
-      return 'REFUND';
-    }
-
-    // Case: 8. 撤销订阅(系统或用户), REVOKED, 失去访问资格
-    // if (type === 'REVOKED') {
-    //   return subscription.NoticeType.;
-    // }
-
-    // Case: 9. 订阅升/降级 CHANGED 生成新订单和交易记录
-    // if (type === 'DID_CHANGE_RENEWAL_PREF' && ['UPGRADE', 'DOWNGRADE'].includes(subType)) {
-    //   return subscription.NoticeType.CHANGED;
-    // }
-
-    // Default case for unmapped notifications
-    // return `[Unsupport]${type}:${subType}`;
-    return 'OTHER';
+    return notice;
   }
 
-  // private formatSubscriptionState(state: string, expireTime: number): subscription.SubscriptionState {
-  //   if (['REVOKED'].includes(state) || expireTime < Date.now()) {
-  //     return state as subscription.SubscriptionState;
-  //   }
-  //   return 'ACTIVE';
-  // }
+  public async validateReceipt(purchaseToken: string): Promise<subscription.Subscription> {
+    const trans = await this.verifier.verifyAndDecodeTransaction(purchaseToken);
+    return {
+      subscription_id: trans.originalTransactionId,
+      period_start: new Date(trans.purchaseDate).toISOString(),
+      period_end: new Date(trans.expiresDate).toISOString(),
+      state: this.formatSubscriptionState('', trans.expiresDate),
+
+      transaction: {
+        transaction_id: trans.transactionId,
+        price_id: trans.productId,
+        region: trans.storefront,
+        amount: trans.price,
+        currency: trans.currency,
+        time_at: new Date(trans.purchaseDate).toISOString(),
+      },
+    };
+  }
+
+  private formatEventBySubscribed(trans): subscription.Subscription {
+    return {
+      subscription_id: trans.originalTransactionId,
+      period_start: new Date(trans.purchaseDate).toISOString(),
+      period_end: new Date(trans.expiresDate).toISOString(),
+      state: 'Active' as subscription.State,
+
+      transaction: {
+        transaction_id: trans.transactionId,
+        price_id: trans.productId,
+        region: trans.storefront,
+        amount: trans.price,
+        currency: trans.currency,
+        time_at: new Date(trans.purchaseDate).toISOString(),
+      },
+    };
+  }
+
+  private formatEventByCommon(trans): subscription.Subscription {
+    return {
+      subscription_id: trans.originalTransactionId,
+      period_start: new Date(trans.purchaseDate).toISOString(),
+      period_end: new Date(trans.expiresDate).toISOString(),
+      state: 'Active' as subscription.State,
+    };
+  }
+
+  private formatEventByCancel(trans): subscription.Subscription {
+    return {
+      subscription_id: trans.originalTransactionId,
+      period_start: new Date(trans.purchaseDate).toISOString(),
+      period_end: new Date(trans.expiresDate).toISOString(),
+      state: 'Cancelled' as subscription.State,
+
+      cancellation: {
+        reason: '',
+        time_at: new Date(trans.signedDate).toISOString(),
+      },
+    };
+  }
+
+  private formatSubscriptionState(state: string, expireTime: number): subscription.State {
+    if (['REVOKED'].includes(state) || expireTime < Date.now()) {
+      return 'Cancelled' as subscription.State;
+    }
+
+    return 'Active';
+  }
 }

@@ -47,10 +47,9 @@ export namespace subscription {
    * RENEWED = 'RENEWED', // 表示用户的订阅已经续订成功，含: 订阅信息 + 交易信息
    * GRACE_PERIOD = 'GRACE_PERIOD', // 表示用户的订阅计划已过期，但是处于宽限期内，可能还可以恢复，含: 订阅信息
    * EXPIRED = 'EXPIRED', // 表示订阅已完全过期（含超过宽限期），无法自动续订，需重新开始新的订阅，含: 订阅信息
-   * CANCELLED = 'CANCELLED', // 用户(或系统)取消订阅，需重新开始新的订阅，含: 订阅信息
-   * REFUND = 'REFUND', // 用户获得了退款，含：订阅信息 + 退款信息
+   * CANCELLED = 'CANCELLED', // 用户(或系统)取消订阅，需重新开始新的订阅，含: 订阅信息, 如何是当前计划取消则包含cancelletion信息
    */
-  export type NoticeType = 'SUBSCRIBED' | 'RENEWED' | 'GRACE_PERIOD' | 'EXPIRED' | 'CANCELLED' | 'REFUND' | 'OTHER';
+  export type NoticeType = 'SUBSCRIBED' | 'RENEWED' | 'GRACE_PERIOD' | 'EXPIRED' | 'CANCELLED' | 'UNHANDLED';
 
   export interface Notice {
     id: string;
