@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 
-import { subscription } from '../types';
+import type { subscription } from '../types';
 // import { ProviderNotificationDto, ProviderSubscription } from './dto/decode-transaction.dto';
 // import { GoogleAuthProfile, GoogleReginPrice } from './interface/google.interface';
 /**
@@ -40,7 +40,7 @@ export class GoogleProviderService {
    * 解码通知消息
    * @doc https://developers.google.com/android-publisher/api-ref/purchases/subscriptions/get
    */
-  async validateWebhookSignature({ message }) {
+  async validateWebhookSignature({ message }): Promise<subscription.Notice> {
     // Base64-decode the message data
     const decodedData = Buffer.from(message.data, 'base64').toString('utf8');
     const notice = JSON.parse(decodedData);
@@ -49,10 +49,11 @@ export class GoogleProviderService {
     if (notice?.subscriptionNotification) {
       const { purchaseToken, notificationType } = notice.subscriptionNotification;
       return {
-        type: this.formatNoticeType(notificationType),
+        type: 'SUBSCRIBED', //this.formatNoticeType(notificationType),
         id: message.messageId as string,
-        payload: notice,
         subscription: await this.validateReceipt(purchaseToken),
+        original: notice,
+        provider: 'Google',
       };
     }
 
@@ -62,18 +63,20 @@ export class GoogleProviderService {
       const subscription = await this.validateReceipt(purchaseToken);
       return {
         type: 'REFUND',
-        noticeId: message.messageId as string,
+        id: message.messageId as string,
         subscription,
+        original: notice,
+        provider: 'Google',
       };
     }
 
     // return notice;
   }
 
-  private formatSubscriptionState(state: string): subscription.SubscriptionState {
+  private formatSubscriptionState(state: string): subscription.State {
     switch (state) {
       case 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD':
-        return 'GRACE';
+        return 'PAUSED';
       case 'SUBSCRIPTION_STATE_CANCELED':
         return 'CANCELLED';
       case 'SUBSCRIPTION_STATE_ON_HOLD':
@@ -106,22 +109,21 @@ export class GoogleProviderService {
 
     return {
       // 应用消息
-      platform: 'Google',
-      subscriptionId: trans.latestOrderId.split('..')[0],
-      productId: lineItems[0].productId,
-      startTime: trans.startTime,
-      expireTime: trans.lineItems[0].expiryTime,
+      subscription_id: trans.latestOrderId.split('..')[0],
+      // productId: lineItems[0].productId,
+      period_start: trans.startTime,
+      period_end: trans.lineItems[0].expiryTime,
       state: this.formatSubscriptionState(subscriptionState),
 
       // 交易信息
-      billing: {
-        transactionId: trans.latestOrderId,
-        regionCode: trans.regionCode,
-        currency: price.currencyCode,
-        price: Number(units) * 1000 + (nanos ? Number(nanos) / 1000000 : 0),
-      },
+      // billing: {
+      //   transactionId: trans.latestOrderId,
+      //   regionCode: trans.regionCode,
+      //   currency: price.currencyCode,
+      //   price: Number(units) * 1000 + (nanos ? Number(nanos) / 1000000 : 0),
+      // },
 
-      isAutoRenew: lineItems[0].autoRenewingPlan.autoRenewEnabled ? 1 : 0,
+      // isAutoRenew: lineItems[0].autoRenewingPlan.autoRenewEnabled ? 1 : 0,
     };
   }
 
@@ -129,36 +131,36 @@ export class GoogleProviderService {
    * 格式化通知状态
    * https://developer.android.com/google/play/billing/rtdn-reference?hl=zh-cn#sub
    */
-  formatNoticeType(notificationType: number): subscription.NoticeType {
-    switch (notificationType) {
-      case 1: // SUBSCRIPTION_RECOVERED
-      case 4: // SUBSCRIPTION_PURCHASED
-        return subscription.NoticeType.SUBSCRIBED; // 从帐号保留状态恢复了订阅或购买了新的订阅 (Case 1)
+  // formatNoticeType(notificationType: number): subscription.NoticeType {
+  //   switch (notificationType) {
+  //     case 1: // SUBSCRIPTION_RECOVERED
+  //     case 4: // SUBSCRIPTION_PURCHASED
+  //       return subscription.NoticeType.SUBSCRIBED; // 从帐号保留状态恢复了订阅或购买了新的订阅 (Case 1)
 
-      case 2: // SUBSCRIPTION_RENEWED
-      case 7: // SUBSCRIPTION_RESTARTED
-        return subscription.NoticeType.RENEWED; // 续订了处于活动状态的订阅或订阅已取消，但在用户恢复时尚未到期 (Case 2)
+  //     case 2: // SUBSCRIPTION_RENEWED
+  //     case 7: // SUBSCRIPTION_RESTARTED
+  //       return subscription.NoticeType.RENEWED; // 续订了处于活动状态的订阅或订阅已取消，但在用户恢复时尚未到期 (Case 2)
 
-      case 3: // SUBSCRIPTION_CANCELED
-        return subscription.NoticeType.CANCELLED; // 自愿或非自愿地取消了订阅 (Case 5)
+  //     case 3: // SUBSCRIPTION_CANCELED
+  //       return subscription.NoticeType.CANCELLED; // 自愿或非自愿地取消了订阅 (Case 5)
 
-      case 5: // SUBSCRIPTION_ON_HOLD
-      case 13: // SUBSCRIPTION_EXPIRED
-        return subscription.NoticeType.EXPIRED; // 订阅已到期，或帐号保留视为过期 (Case 4)
+  //     case 5: // SUBSCRIPTION_ON_HOLD
+  //     case 13: // SUBSCRIPTION_EXPIRED
+  //       return subscription.NoticeType.EXPIRED; // 订阅已到期，或帐号保留视为过期 (Case 4)
 
-      case 6: // SUBSCRIPTION_IN_GRACE_PERIOD
-        return subscription.NoticeType.GRACE_PERIOD; // 宽限期内 (Case 3)
+  //     case 6: // SUBSCRIPTION_IN_GRACE_PERIOD
+  //       return subscription.NoticeType.GRACE_PERIOD; // 宽限期内 (Case 3)
 
-      case 9: // SUBSCRIPTION_DEFERRED
-        return subscription.NoticeType.DEFERRED; // 订阅的续订时间点已延期 (Case 6)
+  //     case 9: // SUBSCRIPTION_DEFERRED
+  //       return subscription.NoticeType.DEFERRED; // 订阅的续订时间点已延期 (Case 6)
 
-      case 12: // SUBSCRIPTION_REVOKED
-        return subscription.NoticeType.REFUND; // 用户在到期时间之前已撤消订阅 (Case 7)
+  //     case 12: // SUBSCRIPTION_REVOKED
+  //       return subscription.NoticeType.REFUND; // 用户在到期时间之前已撤消订阅 (Case 7)
 
-      default:
-        return subscription.NoticeType.OTHER; // 其他未覆盖的情况返回空字符串
-    }
-  }
+  //     default:
+  //       return subscription.NoticeType.OTHER; // 其他未覆盖的情况返回空字符串
+  //   }
+  // }
 
   /**
    * 获取基本订阅计划

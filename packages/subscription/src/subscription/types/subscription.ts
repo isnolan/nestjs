@@ -23,54 +23,82 @@ export namespace subscription {
 
   export interface AsyncOptions {
     imports?: any[];
-    useExisting?: Type<ConfigFactory>;
-    useClass?: Type<ConfigFactory>;
+    useExisting?: Type<Config>;
+    useClass?: Type<Config>;
     useFactory?: (...args: any[]) => Promise<Options> | Options;
     inject?: any[];
   }
 
-  export interface ConfigFactory {
+  export interface Config {
     createSubscriptionConfig(): Promise<Options> | Options;
   }
 
+  // export enum NoticeType {
+  // SUBSCRIBED = 'SUBSCRIBED', // 表示用户新订阅了服务，含: 订阅信息 + 交易信息
+  // RENEWED = 'RENEWED', // 表示用户的订阅已经续订，含: 订阅信息 + 交易信息
+  // GRACE_PERIOD = 'GRACE_PERIOD', // 表示用户的订阅已过期，但是处于宽限期内，可能还可以恢复，含: 订阅信息
+  // EXPIRED = 'EXPIRED', // 表示订阅已完全过期（含超过宽限期），无法自动续订，需重新开始新的订阅，含: 订阅信息
+  // CANCELLED = 'CANCELLED', // 用户(或系统)取消订阅，需重新开始新的订阅，含: 订阅信息
+  // REFUND = 'REFUND', // 用户获得了退款，含：订阅信息 + 退款信息
+  // }
+
   /**
-   * 订阅活动类型
+   * SUBSCRIBED = 'SUBSCRIBED', // 表示用户新订阅了服务，含: 订阅信息 + 交易信息
+   * RENEWED = 'RENEWED', // 表示用户的订阅已经续订，含: 订阅信息 + 交易信息
+   * GRACE_PERIOD = 'GRACE_PERIOD', // 表示用户的订阅已过期，但是处于宽限期内，可能还可以恢复，含: 订阅信息
+   * EXPIRED = 'EXPIRED', // 表示订阅已完全过期（含超过宽限期），无法自动续订，需重新开始新的订阅，含: 订阅信息
+   * CANCELLED = 'CANCELLED', // 用户(或系统)取消订阅，需重新开始新的订阅，含: 订阅信息
+   * REFUND = 'REFUND', // 用户获得了退款，含：订阅信息 + 退款信息
    */
-  export enum NoticeType {
-    SUBSCRIBED = 'SUBSCRIBED',
-    RENEWED = 'RENEWED',
-    GRACE_PERIOD = 'GRACE_PERIOD',
-    EXPIRED = 'EXPIRED',
-    CANCELLED = 'CANCELLED',
-    DEFERRED = 'DEFERRED',
-    REFUND = 'REFUND',
-    REVOKED = 'REVOKED',
-    CHANGED = 'CHANGED',
-    TEST = 'TEST',
-    OTHER = 'OTHER',
-  }
+  export type NoticeType = 'SUBSCRIBED' | 'RENEWED' | 'GRACE_PERIOD' | 'EXPIRED' | 'CANCELLED' | 'REFUND' | 'OTHER';
 
-  export type SubscriptionState = 'ACTIVE' | 'GRACE' | 'EXPIRED' | 'CANCELLED';
-
-  export interface Subscription {
-    platform: 'Google' | 'Apple' | 'Stripe';
-    subscriptionId: string;
-    productId: string;
-    startTime: string;
-    expireTime: string;
-    state: SubscriptionState; // 订阅状态
-    billing: {
-      transactionId: string;
-      regionCode: string;
-      currency: string;
-      price: number;
-    };
-    isAutoRenew: 0 | 1; // 是否续订
-  }
   export interface Notice {
-    type: string;
     id: string;
-    payload: any;
+    type: NoticeType;
+    provider: 'Google' | 'Apple' | 'Stripe';
+    original: any;
     subscription?: Subscription;
+  }
+
+  /**
+   * 订阅类型
+   * ACTIVE：表示订阅处于活跃状态。
+   * PAUSED：表示订阅处于暂停状态。
+   * EXPIRED：表示订阅已过期。
+   * CANCELLED：表示用户取消了订阅。
+   */
+  export type State = 'ACTIVE' | 'PAUSED' | 'EXPIRED' | 'CANCELLED';
+  export interface Subscription {
+    subscription_id: string;
+    period_start: string;
+    period_end: string;
+    state: State; // 订阅状态
+    // productId: string;
+
+    transaction?: Transaction;
+
+    // cancellation?: Cancellation;
+  }
+
+  export interface Transaction {
+    transaction_id: string;
+    price_id: string;
+    region: string;
+    amount: number; // 考虑到不同货币可能需要处理的金额单位问题，这里表示的是转换为主要货币单位后的金额
+    currency: string;
+    time: string; // ISO格式日期时间字符串
+  }
+
+  // export interface Refund {
+  //   transactionId: string; // 对应的支付交易ID
+  //   refundId: string;
+  //   amount: number;
+  //   currency: string;
+  //   refundTime: string; // ISO格式日期时间字符串
+  // }
+
+  export interface Cancellation {
+    reason: string;
+    cancel_time: 0 | 1;
   }
 }

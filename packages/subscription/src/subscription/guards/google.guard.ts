@@ -16,7 +16,6 @@ export class GoogleGuard extends BaseGuard implements CanActivate {
       (request as any).notice = notice;
       this.save('google', notice);
       return true;
-      return true;
     } catch (err) {
       this.save('google', { error: err.message });
       throw new UnauthorizedException(`Google webhook error: ${err.message}`);

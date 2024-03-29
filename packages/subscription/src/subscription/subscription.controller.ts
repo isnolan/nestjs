@@ -15,7 +15,7 @@ export class SubscriptionController {
   @UseGuards(StripeGuard)
   async handleStripe(@Req() request: RequestWithNotice) {
     const { notice } = request;
-    this.service.dispatchEvent('Stripe', event.type, notice);
+    this.service.dispatchEvent('Stripe', notice.type, notice);
   }
 
   @Post('apple')
