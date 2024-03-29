@@ -3,15 +3,15 @@
 `SubscriptionModule` is a comprehensive subscription handling module for NestJS applications, providing seamless integration with multiple subscription platforms such as Stripe, Google Pay, and Apple Pay. It facilitates the handling of subscription events via webhooks, offering a unified approach to verify and process payment notifications securely.
 
 <p>
-  <a href="https://www.npmjs.com/package/@isnolan/nestjs-subscription" > 
-    <img src="https://img.shields.io/npm/v/@isnolan/nestjs-subscription.svg?style=flat" alt="version"  />
+  <a href="https://www.npmjs.com/package/@isnolan/nestjs-payment" > 
+    <img src="https://img.shields.io/npm/v/@isnolan/nestjs-payment.svg?style=flat" alt="version"  />
   </a>
 
-  <a href="https://www.npmjs.com/package/@isnolan/nestjs-subscription">
-    <img alt="downloads" src="https://img.shields.io/npm/dt/@isnolan/nestjs-subscription.svg?style=flat" />
+  <a href="https://www.npmjs.com/package/@isnolan/nestjs-payment">
+    <img alt="downloads" src="https://img.shields.io/npm/dt/@isnolan/nestjs-payment.svg?style=flat" />
   </a>
 
-  <img alt="license" src="https://img.shields.io/npm/l/@isnolan/nestjs-subscription.svg" />
+  <img alt="license" src="https://img.shields.io/npm/l/@isnolan/nestjs-payment.svg" />
 </p>
 
 ## Features
@@ -29,7 +29,7 @@
 #### PNPM
 - Install the package along with the stripe peer dependency
 ```sh
-`pnpm install --save @isnolan/nestjs-subscription`
+`pnpm install --save @isnolan/nestjs-payment`
 ```
 
 ### Import
@@ -39,7 +39,7 @@ To use SubscriptionModule, import and add it to the imports array of your NestJS
 
 #### Synchronous configuration
 ```ts
-import { SubscriptionModule } from '@isnolan/nestjs-subscription';
+import { SubscriptionModule } from '@isnolan/nestjs-payment';
 
 @Module({
   imports: [
@@ -68,7 +68,7 @@ SubscriptionModule also supports asynchronous configuration, which is useful whe
 
 ```typescript
 
-import { SubscriptionModule } from '@isnolan/nestjs-subscription';
+import { SubscriptionModule } from '@isnolan/nestjs-payment';
 import { ConfigService } from '@nestjs/config';
 
 @Module({

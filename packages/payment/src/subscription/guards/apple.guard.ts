@@ -5,10 +5,10 @@ import moment from 'moment-timezone';
 import { AppleProviderService } from '../provider';
 
 export class BaseGuard {
-  protected async save(platform: string, notice: any) {
+  protected async save(provider: string, notice: any) {
     const time = moment().tz('Asia/Shanghai').format('YYMMDDHHmmssSSS');
     !fs.existsSync('./notify') && fs.mkdirSync('./notify');
-    fs.writeFileSync(`./notify/${time}_${platform}.json`, JSON.stringify(notice, null, 2));
+    fs.writeFileSync(`./notify/${time}_${provider}.json`, JSON.stringify(notice, null, 2));
   }
 }
 

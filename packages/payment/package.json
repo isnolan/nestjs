@@ -1,6 +1,6 @@
 {
-  "name": "@isnolan/nestjs-subscription",
-  "version": "1.0.12",
+  "name": "@isnolan/nestjs-payment",
+  "version": "0.0.1",
   "description": "",
   "keywords": [],
   "scripts": {

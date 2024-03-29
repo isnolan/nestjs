@@ -1,4 +1,4 @@
-import { SubscriptionModule } from '@isnolan/nestjs-subscription';
+import { SubscriptionModule } from '@isnolan/nestjs-payment';
 import { Module } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 

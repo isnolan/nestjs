@@ -1,4 +1,4 @@
-import { OnSubscriptionEvent, StripeProviderService } from '@isnolan/nestjs-subscription';
+import { OnSubscriptionEvent, StripeProviderService } from '@isnolan/nestjs-payment';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
