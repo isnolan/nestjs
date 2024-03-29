@@ -26,28 +26,27 @@ export class StripeProviderService {
 
     // case1: SUBSCRIBED OR RENEWED
     if (['invoice.paid'].includes(type)) {
-      const type = 'SUBSCRIBED';
-      const subscription: subscription.Subscription = this.formatEventByCheckoutSession(data);
-      return { ...notice, type, subscription };
+      return this.formatEventByPaid(notice, data);
     }
     // case2: GRACE_PERIOD
     if (['payment_failed'].includes(type)) {
       const type = 'GRACE_PERIOD';
-      // const subscription: subscription.Subscription = this.formatEventByPaymentFailed(data);
-      return { ...notice, type };
+      const subscription = this.formatEventByPaymentFailed(data);
+      return { ...notice, type, subscription };
     }
 
     // case3: EXPIRED
     if (['customer.subscription.deleted'].includes(type)) {
-      const type = 'EXPIRED';
-      return { ...notice, type };
+      const subscription = this.formatEventBySubDeleted(data);
+      return { ...notice, type: 'EXPIRED', subscription };
     }
 
-    // case4: CANCELLED
-    if (['customer.subscription.deleted'].includes(type)) {
-      const type = 'CANCELLED';
-      // const subscription = this.formatEventByCancelled(data);
-      return { ...notice, type };
+    // case4: Cancel
+    if (['customer.subscription.updated'].includes(type)) {
+      const subscription = this.formatEventByCancel(data);
+      if (subscription) {
+        return { ...notice, type: 'CANCELLED', subscription };
+      }
     }
 
     // case5: REFUND
@@ -60,49 +59,75 @@ export class StripeProviderService {
   }
 
   // Subscribed & Renewed
-  private formatEventByCheckoutSession(data: Stripe.Event.Data): subscription.Subscription {
-    const { id, subscription, period_start, period_end, lines } = data.object as Stripe.Invoice;
-    const { created, account_country } = data.object as Stripe.Invoice;
-    const { price } = lines[0];
-    return {
-      subscription_id: subscription as string,
-      period_start: new Date(period_start).toISOString(),
-      period_end: new Date(period_end).toISOString(),
-      state: 'ACTIVE', // 订阅状态
+  private formatEventByPaid(notice: subscription.Notice, data: Stripe.Event.Data): subscription.Notice {
+    const { id, subscription: sub_id, period_start, period_end, lines } = data.object as Stripe.Invoice;
+    const { number, created, account_country } = data.object as Stripe.Invoice;
+    const { price } = lines.data[0];
+
+    const subscription = {
+      subscription_id: sub_id as string,
+      period_start: new Date(period_start * 1000).toISOString(),
+      period_end: new Date(period_end * 1000).toISOString(),
+      state: 'Active' as subscription.State,
 
       transaction: {
         transaction_id: id,
         price_id: price.id,
         region: account_country,
         amount: price.unit_amount,
-        currency: price.currency,
-        time: new Date(created).toISOString(),
+        currency: price.currency.toUpperCase(),
+        time_at: new Date(created * 1000).toISOString(),
       },
     };
+
+    const type = number.endsWith('0001') ? 'SUBSCRIBED' : 'RENEWED';
+    return { ...notice, type, subscription };
   }
 
   // Paused
-  // private formatEventByPaymentFailed(data: Stripe.Event.Data): subscription.Subscription {
-  //   const { subscription, metadata, current_period_start, current_period_end  } = data.object as Stripe.Invoice;
-  //   return {
-  //     subscriptionId: subscription as string,
-  //     startTime: new Date().toISOString(),
-  //     expireTime: 0,
-  //     // isAutoRenew: 0 | 1, // 是否续订
-  //     state: 'PAUSED', // 订阅状态
-  //   };
-  // }
+  private formatEventByPaymentFailed(data: Stripe.Event.Data): subscription.Subscription {
+    const { subscription: sub_id, period_start, period_end } = data.object as Stripe.Invoice;
+
+    return {
+      subscription_id: sub_id as string,
+      period_start: new Date(period_start * 1000).toISOString(),
+      period_end: new Date(period_end * 1000).toISOString(),
+      state: 'Paused' as subscription.State,
+    };
+  }
 
   // Cancelled
-  // private formatEventByCancelled(data: Stripe.Event.Data): subscription.Subscription {
-  //   const { id, current_period_start, current_period_end } = data.object as Stripe.Subscription;
-  //   return {
-  //     subscriptionId: id,
-  //     startTime: current_period_start,
-  //     expireTime: current_period_end,
-  //     state: 'CANCELLED',
-  //   };
-  // }
+  private formatEventByCancel(data: Stripe.Event.Data): subscription.Subscription | false {
+    const { id, canceled_at, current_period_start, current_period_end } = data.object as Stripe.Subscription;
+    const { cancellation_details } = data.object as Stripe.Subscription;
+
+    if (canceled_at) {
+      return {
+        subscription_id: id,
+        period_start: new Date(current_period_start * 1000).toISOString(),
+        period_end: new Date(current_period_end * 1000).toISOString(),
+        state: 'Active' as subscription.State,
+
+        cancellation: {
+          reason: cancellation_details.reason,
+          time_at: new Date(canceled_at * 1000).toISOString(),
+        },
+      };
+    }
+
+    return false;
+  }
+
+  // Expired
+  private formatEventBySubDeleted(data: Stripe.Event.Data): subscription.Subscription {
+    const { id, current_period_start, current_period_end } = data.object as Stripe.Subscription;
+    return {
+      subscription_id: id,
+      period_start: new Date(current_period_start * 1000).toISOString(),
+      period_end: new Date(current_period_end * 1000).toISOString(),
+      state: 'Expired' as subscription.State,
+    };
+  }
 
   async createCheckouSession(opts: stripe.createCheckouDto) {
     const { mode = 'subscription', price_id, user_id, email, success_url, cancel_url } = opts;
