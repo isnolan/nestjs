@@ -1,12 +1,13 @@
 import { OnSubscriptionEvent, StripeProviderService } from '@isnolan/nestjs-payment';
+import { subscription } from '@isnolan/nestjs-payment';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
   constructor(private readonly stripe: StripeProviderService) {}
   // All platform event
-  @OnSubscriptionEvent({ platform: 'all', event: 'all' })
-  handleALLEventSuccess(data: any) {
+  @OnSubscriptionEvent({ platform: 'all', event: 'RENEWED' })
+  handleALLEventSuccess(data: subscription.Subscription) {
     console.log(`[all]all:`, data);
   }
 

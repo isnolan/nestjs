@@ -22,7 +22,7 @@ export class StripeProviderService {
 
     const { webhookSecret } = this.config.stripe;
     const { type, id, data } = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-    const notice: subscription.Notice = { id: id, type: 'UNHANDLED', original: { type, data }, provider: 'Stripe' };
+    const notice: subscription.Notice = { id: id, type: 'UNHANDLED', original: { type, data } };
 
     // case1: SUBSCRIBED OR RENEWED
     if (['invoice.paid'].includes(type)) {

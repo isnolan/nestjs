@@ -51,7 +51,7 @@ export class GoogleProviderService {
       const trans = await this.getSubscription(subscriptionId, purchaseToken);
 
       const id = m.messageId;
-      const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: m }, provider: 'Stripe' };
+      const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: m } };
       console.log(`->trans`, trans);
 
       // case1: SUBSCRIBED

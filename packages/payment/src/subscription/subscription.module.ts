@@ -4,6 +4,7 @@ import Providers from './provider';
 import { SubscriptionController } from './subscription.controller';
 import { SubscriptionService } from './subscription.service';
 import { subscription } from './types';
+export * from './types';
 
 @Global()
 @Module({})

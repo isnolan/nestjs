@@ -54,7 +54,6 @@ export namespace subscription {
   export interface Notice {
     id: string;
     type: NoticeType;
-    provider: 'Google' | 'Apple' | 'Stripe';
     original: any;
     subscription?: Subscription;
   }
@@ -73,11 +72,9 @@ export namespace subscription {
     period_start: string;
     period_end: string;
     state: State; // 订阅状态
-    // productId: string;
 
     transaction?: Transaction;
     cancellation?: Cancellation;
-    // customer?: Customer;
   }
 
   export interface Transaction {
@@ -87,14 +84,6 @@ export namespace subscription {
     amount: number; // 考虑到不同货币可能需要处理的金额单位问题，这里表示的是转换为主要货币单位后的金额
     currency: string;
   }
-
-  // export interface Refund {
-  //   transactionId: string; // 对应的支付交易ID
-  //   refundId: string;
-  //   amount: number;
-  //   currency: string;
-  //   refundTime: string; // ISO格式日期时间字符串
-  // }
 
   export interface Cancellation {
     reason: string;

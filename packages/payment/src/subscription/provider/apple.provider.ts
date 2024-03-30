@@ -67,7 +67,7 @@ export class AppleProviderService {
   public async validateWebhookSignature({ signedPayload }): Promise<subscription.Notice> {
     const n: ResponseBodyV2DecodedPayload = await this.verifier.verifyAndDecodeNotification(signedPayload);
     const { notificationUUID: id, notificationType: type, subtype } = n;
-    const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: n }, provider: 'Apple' };
+    const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: n } };
 
     if (n.data?.signedTransactionInfo) {
       const transactionInfo = await this.verifier.verifyAndDecodeTransaction(n.data.signedTransactionInfo);
