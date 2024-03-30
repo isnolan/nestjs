@@ -70,20 +70,20 @@ export class SubscriptionService implements OnModuleInit {
     handlers.forEach((handler) => handler(data));
   }
 
-  async validateReceipt(platform: string, receipt: string): Promise<subscription.Subscription> {
+  async validateReceipt(provider: string, receipt: string): Promise<subscription.Subscription> {
     const time = moment().tz('Asia/Shanghai').format('YYMMDDHHmmssSSS');
     let notice: subscription.Subscription;
-    if (platform === 'Apple') {
+    if (provider === 'Apple') {
       notice = await this.apple.validateReceipt(receipt);
     }
 
-    if (platform === 'Google') {
+    if (provider === 'Google') {
       notice = await this.google.validateReceipt(receipt);
     }
 
     !fs.existsSync('./notify') && fs.mkdirSync('./notify');
-    fs.writeFileSync(`./notify/${time}_${platform}.json`, JSON.stringify({ receipt, notice }, null, 2));
+    fs.writeFileSync(`./notify/${time}_${provider}.json`, JSON.stringify({ receipt, notice }, null, 2));
 
-    throw new Error(`Unsupported platform: ${platform}`);
+    throw new Error(`Unsupported platform: ${provider}`);
   }
 }
