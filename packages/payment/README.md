@@ -35,7 +35,7 @@ Install the package along with the Stripe peer dependency:
 
 ### Import
 
-### Asynchronous configuration
+#### Asynchronous configuration
 Synchronous Configuration
 To utilize SubscriptionModule, import and add it to the imports array of your NestJS module, typically AppModule. Here's a synchronous configuration example:
 #### Synchronous configuration
@@ -127,6 +127,60 @@ It will be very complicated to connect the subscription interfaces and webhooks 
 | Expired         | Represents the state where the subscription has reached its expiration date and is no longer active. |
 | Cancelled       | Indicates that the subscription has been cancelled, either by the user or due to non-payment, and access to the subscribed services or content has been revoked. |
 
+#### Subscribed event
+```typescript
+import { OnSubscriptionEvent, StripeProviderService } from '@isnolan/nestjs-payment';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  constructor(private readonly stripe: StripeProviderService) {}
+  // All platform event
+  @OnSubscriptionEvent({ platform: 'all', event: 'all' }) 
+  handleALLEventSuccess(data: any) {
+    console.log(`[all]all:`, data);
+  }
+
+  // Unified events for all platforms
+  @OnSubscriptionEvent({ platform: 'all', event: 'RENEWED' }) // 
+  handleStripeSubsriptionSuccess(data: any) {
+    console.log(`[all]RENEWED:`, data);
+  }
+
+  // Original events of the specified platform 
+  @OnSubscriptionEvent({ platform: 'all', event: 'invoice.paid' }) // origin event
+  handleStripeOriginEventSuccess(data: any) {
+    console.log(`[all]invoice.paid:`, data);
+  }
+
+  // All events on the specified platform
+  @OnSubscriptionEvent({ platform: 'apple', event: 'all' })
+  handleAppleSubsriptionSuccess(data: any) {
+    console.log(`[apple]all:`, data);
+  }
+}
+
+```
+
+#### Valdate App(Google Play & Apple Store) receipt 
+```typescript
+import {SubscriptionService } from '@isnolan/nestjs-payment';
+
+@Injectable()
+export class StripeProcessService {
+    constructor(
+    private readonly subscription: SubscriptionService,
+  ) {}
+
+  @Post('receipt')
+  async validateAppReceipt(@Body() payload: ValidateReceiptDto) {
+    const { platform, purchase_token } = payload;
+    const subscription = await this.subscription.validateReceipt(platform, purchase_token);
+    console.log(`[purchase]receipt`, subscription);
+  }
+}
+
+```
 
 ## Contribute
 

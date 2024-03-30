@@ -4,26 +4,27 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   constructor(private readonly stripe: StripeProviderService) {}
-  // @OnSubscriptionEvent({ platform: 'all', event: 'all' })
-  // @OnSubscriptionEvent({ platform: 'all', event: 'invoice.paid' })
-  @OnSubscriptionEvent({ platform: 'stripe', event: 'all' })
-  handleStripeSubsriptionSuccess(data: any) {
-    console.log(`[stripe]`, data);
+  // All platform event
+  @OnSubscriptionEvent({ platform: 'all', event: 'all' })
+  handleALLEventSuccess(data: any) {
+    console.log(`[all]all:`, data);
   }
 
-  @OnSubscriptionEvent({ platform: 'apple', event: 'all' })
-  handleAppleSubsriptionSuccess(data: any) {
-    console.log(`[apple]`, data);
-  }
+  // Unified events for all platforms
+  // @OnSubscriptionEvent({ platform: 'all', event: 'RENEWED' }) //
+  // handleStripeSubsriptionSuccess(data: any) {
+  //   console.log(`[all]RENEWED:`, data);
+  // }
 
-  @OnSubscriptionEvent({ platform: 'google', event: 'all' })
-  handleGoogleSubsriptionSuccess(data: any) {
-    // 返回统一数据、原始数据
-    console.log(`[google]`, data);
-  }
+  // // Original events of the specified platform
+  // @OnSubscriptionEvent({ platform: 'all', event: 'invoice.paid' }) // origin event
+  // handleStripeOriginEventSuccess(data: any) {
+  //   console.log(`[all]invoice.paid:`, data);
+  // }
 
-  async validateReceipt(platform: string, receipt: any) {
-    // validate receipt by google & apple pay
-    console.log(`[receipt]`, platform, receipt);
-  }
+  // // All events on the specified platform
+  // @OnSubscriptionEvent({ platform: 'apple', event: 'all' })
+  // handleAppleSubsriptionSuccess(data: any) {
+  //   console.log(`[apple]all:`, data);
+  // }
 }
