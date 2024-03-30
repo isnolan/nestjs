@@ -86,7 +86,6 @@ export namespace subscription {
     region: string;
     amount: number; // 考虑到不同货币可能需要处理的金额单位问题，这里表示的是转换为主要货币单位后的金额
     currency: string;
-    time_at: string; // ISO格式日期时间字符串
   }
 
   // export interface Refund {

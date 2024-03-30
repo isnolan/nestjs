@@ -57,7 +57,7 @@ export class StripeProviderService {
   // Subscribed & Renewed
   private formatEventByPaid(notice: subscription.Notice, data: Stripe.Event.Data): subscription.Notice {
     const { id, subscription: sub_id, period_start, period_end, lines } = data.object as Stripe.Invoice;
-    const { number, created, account_country } = data.object as Stripe.Invoice;
+    const { number, account_country } = data.object as Stripe.Invoice;
     const { price } = lines.data[0];
 
     const subscription = {
@@ -72,7 +72,6 @@ export class StripeProviderService {
         region: account_country,
         amount: price.unit_amount,
         currency: price.currency.toUpperCase(),
-        time_at: new Date(created * 1000).toISOString(),
       },
     };
 

@@ -40,37 +40,156 @@ export class GoogleProviderService {
    * 解码通知消息
    * @doc https://developers.google.com/android-publisher/api-ref/purchases/subscriptions/get
    */
-  async validateWebhookSignature({ message }): Promise<subscription.Notice> {
+  async validateWebhookSignature({ message: m }): Promise<subscription.Notice> {
     // Base64-decode the message data
-    const decodedData = Buffer.from(message.data, 'base64').toString('utf8');
-    const notice = JSON.parse(decodedData);
+    const decodedData = Buffer.from(m.data, 'base64').toString('utf8');
+    const n = JSON.parse(decodedData);
 
     // 订阅消息
-    if (notice?.subscriptionNotification) {
-      const { purchaseToken, notificationType } = notice.subscriptionNotification;
-      return {
-        type: 'SUBSCRIBED', //this.formatNoticeType(notificationType),
-        id: message.messageId as string,
-        subscription: await this.validateReceipt(purchaseToken),
-        original: notice,
-        provider: 'Google',
-      };
+    if (n?.subscriptionNotification) {
+      const { subscriptionId, purchaseToken, notificationType: type } = n.subscriptionNotification;
+      const trans = await this.getSubscription(subscriptionId, purchaseToken);
+
+      const id = m.messageId;
+      const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: m }, provider: 'Stripe' };
+      console.log(`->trans`, trans);
+
+      // case1: SUBSCRIBED
+      if ([1, 4].includes(type)) {
+        const subscription = await this.formatEventBySubscribed(trans);
+        return { ...notice, type: 'SUBSCRIBED', subscription };
+      }
+
+      // case2: RENEWED
+      if ([2, 7].includes(type)) {
+        const subscription = await this.formatEventBySubscribed(trans);
+        return { ...notice, type: 'RENEWED', subscription };
+      }
+
+      // case3: Grace Period
+      if ([6].includes(type)) {
+        const subscription = this.formatEventByGracePeriod(trans);
+        return { ...notice, type: 'GRACE_PERIOD', subscription };
+      }
+
+      // case4: Expired
+      if ([5, 13].includes(type)) {
+        const subscription = this.formatEventByCommon(trans);
+        return { ...notice, type: 'GRACE_PERIOD', subscription };
+      }
+
+      // case5: Cancelled, cancel at period end
+      if ([3].includes(type)) {
+        const subscription = await this.formatEventByCancel(trans);
+        return { ...notice, type: 'CANCELLED', subscription };
+      }
+
+      // case6: Revoked, cancel at now
+      if ([12].includes(type)) {
+        const subscription = this.formatEventByCancel(trans, true);
+        return { ...notice, type: 'CANCELLED', subscription };
+      }
+
+      return notice;
     }
 
     // 退款消息
-    if (notice?.voidedPurchaseNotification) {
-      const { purchaseToken } = notice.voidedPurchaseNotification;
-      const subscription = await this.validateReceipt(purchaseToken);
-      return {
-        type: 'REFUND',
-        id: message.messageId as string,
-        subscription,
-        original: notice,
-        provider: 'Google',
-      };
-    }
+    // if (n?.voidedPurchaseNotification) {
+    //   const { purchaseToken } = n.voidedPurchaseNotification;
+    //   const subscription = await this.validateReceipt(purchaseToken);
+    //   return {
+    //     type: 'REFUND',
+    //     id: message.messageId as string,
+    //     subscription,
+    //     original: notice,
+    //     provider: 'Google',
+    //   };
+    // }
 
     // return notice;
+  }
+
+  /**
+   * 获得订阅详情
+   * https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2?hl=zh-cn#SubscriptionPurchaseV2
+   * @param subscriptionId
+   * @param token
+   * @returns
+   */
+  async getSubscription(productId: string, token: string) {
+    const packageName = this.packageName;
+    const { data: trans } = await this.publisher.purchases.subscriptionsv2.get({ packageName, token });
+    const { subscriptionState, acknowledgementState } = trans;
+
+    if (subscriptionState === 'SUBSCRIPTION_STATE_ACTIVE' && acknowledgementState === 'ACKNOWLEDGEMENT_STATE_PENDING') {
+      await this.acknowledgePurchase(productId, token); // 确认凭证
+    }
+
+    return trans;
+  }
+
+  private async formatEventBySubscribed(trans): Promise<subscription.Subscription> {
+    const { lineItems, regionCode } = trans;
+    const { productId, offerDetails } = lineItems[0];
+    const { price } = await this.getRegionalPrice(productId, offerDetails.basePlanId, regionCode);
+    const { units, nanos } = price;
+
+    return {
+      subscription_id: trans.latestOrderId.split('..')[0],
+      period_start: trans.startTime,
+      period_end: trans.lineItems[0].expiryTime,
+      state: 'Active' as subscription.State,
+
+      transaction: {
+        transaction_id: trans.latestOrderId,
+        price_id: lineItems[0].productId,
+        region: regionCode,
+        amount: Number(units) * 1000 + (nanos ? Number(nanos) / 1000000 : 0),
+        currency: price.currencyCode,
+      },
+    };
+  }
+
+  private formatEventByGracePeriod(trans): subscription.Subscription {
+    return {
+      subscription_id: trans.latestOrderId.split('..')[0],
+      period_start: trans.startTime,
+      period_end: trans.lineItems[0].expiryTime,
+      state: 'Paused' as subscription.State,
+    };
+  }
+
+  private formatEventByCommon(trans): subscription.Subscription {
+    return {
+      subscription_id: trans.latestOrderId.split('..')[0],
+      period_start: trans.startTime,
+      period_end: trans.lineItems[0].expiryTime,
+      state: 'Active' as subscription.State,
+    };
+  }
+
+  private formatEventByCancel(trans, immediate = false): subscription.Subscription {
+    let reason = '';
+    if ('canceledStateContext' in trans) {
+      if ('systemInitiatedCancellation' in trans.canceledStateContext) {
+        reason = 'system cancel';
+      }
+      if ('userInitiatedCancellation' in trans.canceledStateContext) {
+        reason = 'user cancel';
+      }
+    }
+
+    return {
+      subscription_id: trans.latestOrderId.split('..')[0],
+      period_start: trans.startTime,
+      period_end: trans.lineItems[0].expiryTime,
+      state: immediate ? 'Cancelled' : 'Active',
+
+      cancellation: {
+        reason,
+        time_at: new Date(trans.signedDate).toISOString(),
+      },
+    };
   }
 
   private formatSubscriptionState(state: string): subscription.State {

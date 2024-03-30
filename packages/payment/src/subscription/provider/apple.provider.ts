@@ -99,16 +99,17 @@ export class AppleProviderService {
 
       // case5: CANCELLED
       if (type === 'DID_CHANGE_RENEWAL_STATUS' && subtype === 'AUTO_RENEW_DISABLED') {
-        const subscription = this.formatEventByCommon(transactionInfo);
+        const subscription = this.formatEventByCancel(transactionInfo);
         return { ...notice, type: 'CANCELLED', subscription };
       }
 
       // case6: REFUND or REVOKED
       if (['REFUND', 'REVOKED'].includes(type)) {
-        const subscription = this.formatEventByCancel(transactionInfo);
+        const subscription = this.formatEventByCancel(transactionInfo, true);
         return { ...notice, type: 'CANCELLED', subscription };
       }
     }
+
     // if (n.data?.signedRenewalInfo) {
     //   const renewalInfo = await this.verifier.verifyAndDecodeRenewalInfo(n.data.signedRenewalInfo);
     //   Object.assign(n.data, { renewalInfo });
@@ -131,7 +132,6 @@ export class AppleProviderService {
         region: trans.storefront,
         amount: trans.price,
         currency: trans.currency,
-        time_at: new Date(trans.purchaseDate).toISOString(),
       },
     };
   }
@@ -149,7 +149,6 @@ export class AppleProviderService {
         region: trans.storefront,
         amount: trans.price,
         currency: trans.currency,
-        time_at: new Date(trans.purchaseDate).toISOString(),
       },
     };
   }
@@ -163,12 +162,12 @@ export class AppleProviderService {
     };
   }
 
-  private formatEventByCancel(trans): subscription.Subscription {
+  private formatEventByCancel(trans, immediate = false): subscription.Subscription {
     return {
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
-      state: 'Cancelled' as subscription.State,
+      state: immediate ? 'Cancelled' : 'Active',
 
       cancellation: {
         reason: '',
