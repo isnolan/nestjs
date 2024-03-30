@@ -44,7 +44,7 @@ export class SubscriptionService implements OnModuleInit {
         const metadata = Reflect.getMetadata(ON_EVENT_KEY, handler);
         if (metadata) {
           const { platform, event } = metadata;
-          const key = `${platform}:${event}`;
+          const key = `${platform.toLowerCase()}:${event.toLowerCase()}`;
           if (!this.eventHandlersMap.has(key)) {
             this.eventHandlersMap.set(key, []);
           }
@@ -54,6 +54,8 @@ export class SubscriptionService implements OnModuleInit {
   }
 
   dispatchEvent(platform: string, event: string, data: any) {
+    event = event.toLowerCase();
+    platform = platform.toLowerCase();
     const specificHandlers = this.eventHandlersMap.get(`${platform}:${event}`) || [];
     const allEventHandlers = this.eventHandlersMap.get('all:all') || [];
     const allPlatformSpecificEventHandlers = this.eventHandlersMap.get(`all:${event}`) || [];

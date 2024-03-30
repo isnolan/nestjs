@@ -1,6 +1,6 @@
 {
   "name": "@isnolan/nestjs-payment",
-  "version": "0.1.3",
+  "version": "0.1.9",
   "description": "nestjs-payment is a comprehensive NestJS module for simplified subscription management and seamless integration with popular payment platforms.",
   "keywords": [
     "nestjs",
