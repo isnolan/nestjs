@@ -29,7 +29,7 @@
     "paths": {
       "*": ["packages/*", "apps/*", "demos/*"],
       "@isnolan/nestjs-nacos": ["./packages/nacos"],
-      "@isnolan/nestjs-payment": ["./packages/subscription"],
+      "@isnolan/nestjs-payment": ["./packages/payment"],
     },
 
     /* Additional Options */

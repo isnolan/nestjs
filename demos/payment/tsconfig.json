@@ -16,7 +16,7 @@
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"], 
-      "@isnolan/nestjs-payment": ["../../packages/payment/src/*"]
+      // "@isnolan/nestjs-payment": ["../../packages/payment/dist/*"]
     }
   }
 }
