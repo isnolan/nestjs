@@ -65,7 +65,7 @@ export namespace subscription {
    * EXPIRED：表示订阅已过期。
    * CANCELLED：表示用户取消了订阅。
    */
-  export type State = 'Active' | 'Paused' | 'Expired' | 'Cancelled';
+  export type State = 'active' | 'suspend' | 'expired' | 'cancelled';
 
   export interface Subscription {
     provider: 'apple' | 'google' | 'stripe';

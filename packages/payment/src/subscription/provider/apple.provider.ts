@@ -143,7 +143,7 @@ export class AppleProviderService {
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
-      state: 'Active' as subscription.State,
+      state: 'active' as subscription.State,
 
       transaction: {
         transaction_id: trans.transactionId,
@@ -161,7 +161,7 @@ export class AppleProviderService {
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
-      state: 'Active' as subscription.State,
+      state: 'active' as subscription.State,
     };
   }
 
@@ -171,7 +171,7 @@ export class AppleProviderService {
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
-      state: immediate ? 'Cancelled' : 'Active',
+      state: immediate ? 'cancelled' : 'active',
 
       cancellation: {
         reason: '',
@@ -182,9 +182,9 @@ export class AppleProviderService {
 
   private formatSubscriptionState(state: string, expireTime: number): subscription.State {
     if (['REVOKED'].includes(state) || expireTime < Date.now()) {
-      return 'Cancelled' as subscription.State;
+      return 'cancelled' as subscription.State;
     }
 
-    return 'Active';
+    return 'active';
   }
 }

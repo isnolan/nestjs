@@ -139,7 +139,7 @@ export class GoogleProviderService {
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
-      state: 'Active' as subscription.State,
+      state: 'active' as subscription.State,
 
       transaction: {
         transaction_id: trans.latestOrderId,
@@ -157,7 +157,7 @@ export class GoogleProviderService {
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
-      state: 'Paused' as subscription.State,
+      state: 'suspend' as subscription.State,
     };
   }
 
@@ -167,7 +167,7 @@ export class GoogleProviderService {
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
-      state: 'Active' as subscription.State,
+      state: 'active' as subscription.State,
     };
   }
 
@@ -187,7 +187,7 @@ export class GoogleProviderService {
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
-      state: immediate ? 'Cancelled' : 'Active',
+      state: immediate ? 'cancelled' : 'active',
 
       cancellation: {
         reason,
@@ -199,14 +199,14 @@ export class GoogleProviderService {
   private formatSubscriptionState(state: string): subscription.State {
     switch (state) {
       case 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD':
-        return 'Paused';
+        return 'suspend';
       case 'SUBSCRIPTION_STATE_CANCELED':
-        return 'Cancelled';
+        return 'cancelled';
       case 'SUBSCRIPTION_STATE_ON_HOLD':
       case 'SUBSCRIPTION_STATE_EXPIRED':
-        return 'Expired';
+        return 'expired';
       default:
-        return 'Active';
+        return 'active';
     }
   }
 

@@ -65,7 +65,7 @@ export class StripeProviderService {
       subscription_id: sub_id as string,
       period_start: new Date(period.start * 1000).toISOString(),
       period_end: new Date(period.end * 1000).toISOString(),
-      state: 'Active' as subscription.State,
+      state: 'active' as subscription.State,
 
       transaction: {
         transaction_id: id,
@@ -91,7 +91,7 @@ export class StripeProviderService {
       subscription_id: sub_id as string,
       period_start: new Date(period.start * 1000).toISOString(),
       period_end: new Date(period.end * 1000).toISOString(),
-      state: 'Paused' as subscription.State,
+      state: 'suspend' as subscription.State,
     };
   }
 
@@ -109,7 +109,7 @@ export class StripeProviderService {
         subscription_id: id,
         period_start: new Date(current_period_start * 1000).toISOString(),
         period_end: new Date(current_period_end * 1000).toISOString(),
-        state: immediate ? 'Cancelled' : 'Active',
+        state: immediate ? 'cancelled' : 'active',
 
         cancellation: {
           reason: cancellation_details.reason,
@@ -128,7 +128,7 @@ export class StripeProviderService {
       subscription_id: id,
       period_start: new Date(current_period_start * 1000).toISOString(),
       period_end: new Date(current_period_end * 1000).toISOString(),
-      state: 'Expired' as subscription.State,
+      state: 'expired' as subscription.State,
     };
   }
 
