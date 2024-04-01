@@ -229,20 +229,17 @@ export class GoogleProviderService {
     return {
       // 应用消息
       subscription_id: trans.latestOrderId.split('..')[0],
-      // productId: lineItems[0].productId,
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
       state: this.formatSubscriptionState(subscriptionState),
 
-      // 交易信息
-      // billing: {
-      //   transactionId: trans.latestOrderId,
-      //   regionCode: trans.regionCode,
-      //   currency: price.currencyCode,
-      //   price: Number(units) * 1000 + (nanos ? Number(nanos) / 1000000 : 0),
-      // },
-
-      // isAutoRenew: lineItems[0].autoRenewingPlan.autoRenewEnabled ? 1 : 0,
+      transaction: {
+        transaction_id: trans.latestOrderId,
+        product_id: lineItems[0].productId,
+        region: trans.regionCode,
+        amount: Number(units) * 1000 + (nanos ? Number(nanos) / 1000000 : 0),
+        currency: price.currencyCode,
+      },
     };
   }
 
