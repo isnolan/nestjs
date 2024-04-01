@@ -182,6 +182,13 @@ export class StripeProcessService {
 
 ```
 
+## About Best Partice
+### Product Id
+In order to comply with the common rules of Stripe, Google Play, and Apple Play, we strongly recommend that you first create a subscription item in Stripe and obtain the Price_id, and convert it into a lowercase storage business database (product_id), and synchronize the lowercase price_id Product_id for your subscription on Google Play and Apple Play.
+
+In your Client App, you need to use the lowercase price_id here.
+Before you create a stripe checkout session, you may need to hardcode the original Price ID from Stripe to create.
+In your `@OnSubscriptionEvent` callback function, you need to force lowercase the Price ID obtained from stripe to check with the product_id in the business database.
 
 ## License
 
