@@ -1,4 +1,4 @@
-import { OnSubscriptionEvent, SubscriptionEvent } from '@isnolan/nestjs-payment';
+import { OnSubscriptionEvent } from '@isnolan/nestjs-payment';
 import { subscription } from '@isnolan/nestjs-payment';
 import { Injectable } from '@nestjs/common';
 
