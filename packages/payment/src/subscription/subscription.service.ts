@@ -43,8 +43,8 @@ export class SubscriptionService implements OnModuleInit {
         const handler = instance[method];
         const metadata = Reflect.getMetadata(ON_EVENT_KEY, handler);
         if (metadata) {
-          const { platform, event } = metadata;
-          const key = `${platform.toLowerCase()}:${event.toLowerCase()}`;
+          const { provider, event } = metadata;
+          const key = `${provider.toLowerCase()}:${event.toLowerCase()}`;
           if (!this.eventHandlersMap.has(key)) {
             this.eventHandlersMap.set(key, []);
           }
@@ -53,19 +53,19 @@ export class SubscriptionService implements OnModuleInit {
       });
   }
 
-  dispatchEvent(platform: string, event: string, data: any) {
+  dispatchEvent(provider: string, event: string, data: any) {
     event = event.toLowerCase();
-    platform = platform.toLowerCase();
-    const specificHandlers = this.eventHandlersMap.get(`${platform}:${event}`) || [];
+    provider = provider.toLowerCase();
+    const specificHandlers = this.eventHandlersMap.get(`${provider}:${event}`) || [];
     const allEventHandlers = this.eventHandlersMap.get('all:all') || [];
     const allPlatformSpecificEventHandlers = this.eventHandlersMap.get(`all:${event}`) || [];
-    const platformAllEventHandlers = this.eventHandlersMap.get(`${platform}:all`) || [];
+    const providerAllEventHandlers = this.eventHandlersMap.get(`${provider}:all`) || [];
 
     // 合并所有匹配的处理器
     const handlers = [
       ...specificHandlers,
       ...allPlatformSpecificEventHandlers,
-      ...platformAllEventHandlers,
+      ...providerAllEventHandlers,
       ...allEventHandlers,
     ];
 
@@ -86,6 +86,6 @@ export class SubscriptionService implements OnModuleInit {
     !fs.existsSync('./notify') && fs.mkdirSync('./notify');
     fs.writeFileSync(`./notify/${time}_${provider}.json`, JSON.stringify({ receipt, notice }, null, 2));
 
-    throw new Error(`Unsupported platform: ${provider}`);
+    throw new Error(`Unsupported provider: ${provider}`);
   }
 }

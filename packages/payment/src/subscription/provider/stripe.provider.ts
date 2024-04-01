@@ -56,14 +56,15 @@ export class StripeProviderService {
 
   // Subscribed & Renewed
   private formatEventByPaid(notice: subscription.Notice, data: Stripe.Event.Data): subscription.Notice {
-    const { id, subscription: sub_id, period_start, period_end, lines } = data.object as Stripe.Invoice;
-    const { number, account_country } = data.object as Stripe.Invoice;
-    const { price } = lines.data[0];
+    const { id, subscription: sub_id, lines } = data.object as Stripe.Invoice;
+    const { number, account_country, customer, customer_email, customer_name } = data.object as Stripe.Invoice;
+    const { price, period } = lines.data[0];
 
-    const subscription = {
+    const subscription: subscription.Subscription = {
+      provider: 'stripe',
       subscription_id: sub_id as string,
-      period_start: new Date(period_start * 1000).toISOString(),
-      period_end: new Date(period_end * 1000).toISOString(),
+      period_start: new Date(period.start * 1000).toISOString(),
+      period_end: new Date(period.end * 1000).toISOString(),
       state: 'Active' as subscription.State,
 
       transaction: {
@@ -73,6 +74,7 @@ export class StripeProviderService {
         amount: price.unit_amount,
         currency: price.currency.toUpperCase(),
       },
+      customer: { id: customer as string, name: customer_name, email: customer_email },
     };
 
     const type = number.endsWith('0001') ? 'SUBSCRIBED' : 'RENEWED';
@@ -81,12 +83,14 @@ export class StripeProviderService {
 
   // Paused
   private formatEventByPaymentFailed(data: Stripe.Event.Data): subscription.Subscription {
-    const { subscription: sub_id, period_start, period_end } = data.object as Stripe.Invoice;
+    const { subscription: sub_id, lines } = data.object as Stripe.Invoice;
+    const { period } = lines.data[0];
 
     return {
+      provider: 'stripe',
       subscription_id: sub_id as string,
-      period_start: new Date(period_start * 1000).toISOString(),
-      period_end: new Date(period_end * 1000).toISOString(),
+      period_start: new Date(period.start * 1000).toISOString(),
+      period_end: new Date(period.end * 1000).toISOString(),
       state: 'Paused' as subscription.State,
     };
   }
@@ -101,6 +105,7 @@ export class StripeProviderService {
       }
 
       return {
+        provider: 'stripe',
         subscription_id: id,
         period_start: new Date(current_period_start * 1000).toISOString(),
         period_end: new Date(current_period_end * 1000).toISOString(),
@@ -119,6 +124,7 @@ export class StripeProviderService {
   private formatEventBySubDeleted(data: Stripe.Event.Data): subscription.Subscription {
     const { id, current_period_start, current_period_end } = data.object as Stripe.Subscription;
     return {
+      provider: 'stripe',
       subscription_id: id,
       period_start: new Date(current_period_start * 1000).toISOString(),
       period_end: new Date(current_period_end * 1000).toISOString(),

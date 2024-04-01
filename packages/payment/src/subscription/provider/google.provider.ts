@@ -135,6 +135,7 @@ export class GoogleProviderService {
     const { units, nanos } = price;
 
     return {
+      provider: 'google',
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
@@ -152,6 +153,7 @@ export class GoogleProviderService {
 
   private formatEventByGracePeriod(trans): subscription.Subscription {
     return {
+      provider: 'google',
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
@@ -161,6 +163,7 @@ export class GoogleProviderService {
 
   private formatEventByCommon(trans): subscription.Subscription {
     return {
+      provider: 'google',
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
@@ -180,6 +183,7 @@ export class GoogleProviderService {
     }
 
     return {
+      provider: 'google',
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,
@@ -227,7 +231,7 @@ export class GoogleProviderService {
     const { units, nanos } = price;
 
     return {
-      // 应用消息
+      provider: 'google',
       subscription_id: trans.latestOrderId.split('..')[0],
       period_start: trans.startTime,
       period_end: trans.lineItems[0].expiryTime,

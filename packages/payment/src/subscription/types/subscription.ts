@@ -68,6 +68,7 @@ export namespace subscription {
   export type State = 'Active' | 'Paused' | 'Expired' | 'Cancelled';
 
   export interface Subscription {
+    provider: 'apple' | 'google' | 'stripe';
     subscription_id: string;
     period_start: string;
     period_end: string;
@@ -75,6 +76,7 @@ export namespace subscription {
 
     transaction?: Transaction;
     cancellation?: Cancellation;
+    customer?: Customer; // stripe only
   }
 
   export interface Transaction {
@@ -91,8 +93,8 @@ export namespace subscription {
   }
 
   export interface Customer {
+    id: string;
     email: string;
-    phone: string;
     name: string;
   }
 }

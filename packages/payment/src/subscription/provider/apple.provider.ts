@@ -121,6 +121,7 @@ export class AppleProviderService {
   public async validateReceipt(purchaseToken: string): Promise<subscription.Subscription> {
     const trans = await this.verifier.verifyAndDecodeTransaction(purchaseToken);
     return {
+      provider: 'apple',
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
@@ -138,6 +139,7 @@ export class AppleProviderService {
 
   private formatEventBySubscribed(trans): subscription.Subscription {
     return {
+      provider: 'apple',
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
@@ -155,6 +157,7 @@ export class AppleProviderService {
 
   private formatEventByCommon(trans): subscription.Subscription {
     return {
+      provider: 'apple',
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
@@ -164,6 +167,7 @@ export class AppleProviderService {
 
   private formatEventByCancel(trans, immediate = false): subscription.Subscription {
     return {
+      provider: 'apple',
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),

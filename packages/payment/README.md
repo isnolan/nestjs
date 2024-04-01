@@ -135,26 +135,26 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   constructor(private readonly stripe: StripeProviderService) {}
-  // All platform event
-  @OnSubscriptionEvent({ platform: 'all', event: 'all' }) 
+  // All provider event
+  @OnSubscriptionEvent({ provider: 'all', event: 'all' }) 
   handleALLEventSuccess(data: any) {
     console.log(`[all]all:`, data);
   }
 
-  // Unified events for all platforms
-  @OnSubscriptionEvent({ platform: 'all', event: 'RENEWED' }) // 
+  // Unified events for all provider
+  @OnSubscriptionEvent({ provider: 'all', event: 'RENEWED' }) // 
   handleStripeSubsriptionSuccess(data: any) {
     console.log(`[all]RENEWED:`, data);
   }
 
-  // Original events of the specified platform 
-  @OnSubscriptionEvent({ platform: 'all', event: 'invoice.paid' }) // origin event
+  // Original events of the specified provider 
+  @OnSubscriptionEvent({ provider: 'all', event: 'invoice.paid' }) // origin event
   handleStripeOriginEventSuccess(data: any) {
     console.log(`[all]invoice.paid:`, data);
   }
 
-  // All events on the specified platform
-  @OnSubscriptionEvent({ platform: 'apple', event: 'all' })
+  // All events on the specified provider
+  @OnSubscriptionEvent({ provider: 'apple', event: 'all' })
   handleAppleSubsriptionSuccess(data: any) {
     console.log(`[apple]all:`, data);
   }
@@ -167,13 +167,13 @@ export class AppService {
 import {SubscriptionService } from '@isnolan/nestjs-payment';
 
 @Injectable()
-export class StripeProcessService {
+export class AppService {
     constructor(
     private readonly subscription: SubscriptionService,
   ) {}
 
   @Post('receipt')
-  async validateAppReceipt(@Body() payload: ValidateReceiptDto) {
+  async validateReceipt(@Body() payload: ValidateReceiptDto) {
     const { platform, purchase_token } = payload;
     const subscription = await this.subscription.validateReceipt(platform, purchase_token);
     console.log(`[purchase]receipt`, subscription);
