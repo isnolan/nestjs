@@ -68,7 +68,7 @@ export class StripeProviderService {
 
       transaction: {
         transaction_id: id,
-        price_id: price.id,
+        product_id: price.id,
         region: account_country,
         amount: price.unit_amount,
         currency: price.currency.toUpperCase(),

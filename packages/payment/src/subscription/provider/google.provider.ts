@@ -142,7 +142,7 @@ export class GoogleProviderService {
 
       transaction: {
         transaction_id: trans.latestOrderId,
-        price_id: lineItems[0].productId,
+        product_id: lineItems[0].productId,
         region: regionCode,
         amount: Number(units) * 1000 + (nanos ? Number(nanos) / 1000000 : 0),
         currency: price.currencyCode,

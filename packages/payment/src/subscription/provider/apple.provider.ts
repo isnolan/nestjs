@@ -128,7 +128,7 @@ export class AppleProviderService {
 
       transaction: {
         transaction_id: trans.transactionId,
-        price_id: trans.productId,
+        product_id: trans.productId,
         region: trans.storefront,
         amount: trans.price,
         currency: trans.currency,
@@ -145,7 +145,7 @@ export class AppleProviderService {
 
       transaction: {
         transaction_id: trans.transactionId,
-        price_id: trans.productId,
+        product_id: trans.productId,
         region: trans.storefront,
         amount: trans.price,
         currency: trans.currency,
