@@ -30,6 +30,7 @@
       "*": ["packages/*", "apps/*", "demos/*"],
       "@isnolan/nestjs-nacos": ["./packages/nacos"],
       "@isnolan/nestjs-payment": ["./packages/payment"],
+      "@isnolan/nestjs-auth": ["./packages/auth"],
     },
 
     /* Additional Options */
