@@ -59,7 +59,7 @@ Asynchronous Configuration
 SubscriptionModule also supports asynchronous configuration, useful for determining configurations dynamically at runtime:
 ```typescript
 
-import { AuthModule } from '@isnolan/nestjs-payment';
+import { AuthModule } from '@isnolan/nestjs-auth';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
