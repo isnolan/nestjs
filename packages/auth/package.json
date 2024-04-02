@@ -1,6 +1,6 @@
 {
   "name": "@isnolan/nestjs-auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "nestjs-auth is a comprehensive NestJS module for simplified auth management and seamless integration with popular auth platforms.",
   "keywords": [
     "nestjs",
