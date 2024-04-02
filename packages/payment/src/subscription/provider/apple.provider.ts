@@ -87,13 +87,13 @@ export class AppleProviderService {
 
       // case3: GRACE_PERIOD
       if (type === 'DID_FAIL_TO_RENEW' && subtype === 'GRACE_PERIOD') {
-        const subscription = this.formatEventByCommon(transactionInfo);
+        const subscription = this.formatEventByGrace(transactionInfo);
         return { ...notice, type: 'GRACE_PERIOD', subscription };
       }
 
       // case4: EXPIRED
       if (['EXPIRED', 'GRACE_PERIOD_EXPIRED'].includes(type)) {
-        const subscription = this.formatEventByCommon(transactionInfo);
+        const subscription = this.formatEventByGrace(transactionInfo);
         return { ...notice, type: 'EXPIRED', subscription };
       }
 
@@ -155,13 +155,13 @@ export class AppleProviderService {
     };
   }
 
-  private formatEventByCommon(trans): subscription.Subscription {
+  private formatEventByGrace(trans): subscription.Subscription {
     return {
       provider: 'apple',
       subscription_id: trans.originalTransactionId,
       period_start: new Date(trans.purchaseDate).toISOString(),
       period_end: new Date(trans.expiresDate).toISOString(),
-      state: 'active' as subscription.State,
+      state: 'suspend' as subscription.State,
     };
   }
 
