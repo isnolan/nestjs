@@ -30,7 +30,7 @@
 Using PNPM
 Install the package along with the Stripe peer dependency:
 ```sh
-`pnpm install --save @isnolan/nestjs-payment`
+pnpm install --save @isnolan/nestjs-payment
 ```
 
 ### Import
@@ -68,7 +68,6 @@ export class AppModule {}
 Asynchronous Configuration
 SubscriptionModule also supports asynchronous configuration, useful for determining configurations dynamically at runtime:
 ```typescript
-
 import { SubscriptionModule } from '@isnolan/nestjs-payment';
 import { ConfigService } from '@nestjs/config';
 
