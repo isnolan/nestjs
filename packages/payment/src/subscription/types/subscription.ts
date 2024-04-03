@@ -13,6 +13,7 @@ export namespace subscription {
       privateKey: string;
     };
     apple?: {
+      appAppleId?: number; // production only
       signingKey: string;
       keyId: string;
       issuerId: string;

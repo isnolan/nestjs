@@ -20,12 +20,12 @@ export class AppleProviderService {
       return;
     }
 
-    const { signingKey, keyId, issuerId, bundleId, environment: env } = this.config.apple;
+    const { signingKey, keyId, issuerId, bundleId, appAppleId, environment: env } = this.config.apple;
     const environment = env === 'Production' ? Environment.PRODUCTION : Environment.SANDBOX;
     this.client = new AppStoreServerAPIClient(signingKey, keyId, issuerId, bundleId, environment);
 
     this.readAppleCerts().then((appleRootCAs) => {
-      this.verifier = new SignedDataVerifier(appleRootCAs, true, environment, bundleId);
+      this.verifier = new SignedDataVerifier(appleRootCAs, true, environment, bundleId, appAppleId);
     });
 
     setTimeout(() => this.requestTestNotification(), 10000);
