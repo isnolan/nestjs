@@ -1,4 +1,5 @@
 import { Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 import { AppleGuard, GoogleGuard, StripeGuard } from './guards';
 import { SubscriptionService } from './subscription.service';
@@ -8,6 +9,7 @@ export interface RequestWithNotice extends Request {
 }
 
 @Controller('notify')
+@ApiExcludeController()
 export class SubscriptionController {
   constructor(private service: SubscriptionService) {}
 

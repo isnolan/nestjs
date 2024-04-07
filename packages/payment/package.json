@@ -1,6 +1,6 @@
 {
   "name": "@isnolan/nestjs-payment",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "nestjs-payment is a comprehensive NestJS module for simplified subscription management and seamless integration with popular payment platforms.",
   "keywords": [
     "nestjs",
@@ -28,6 +28,7 @@
   ],
   "peerDependencies": {
     "@apple/app-store-server-library": "^1.1.0",
+    "@nestjs/swagger": "^7.1.12",
     "moment-timezone": "^0.5.45",
     "@nestjs/common": "^10.3.2",
     "@nestjs/core": "^10.3.2",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@apple/app-store-server-library": "^1.1.0",
+    "@nestjs/swagger": "^7.1.12",
     "@nestjs/common": "^10.3.5",
     "@nestjs/core": "^10.3.5",
     "@swc/core": "^1.4.8",
