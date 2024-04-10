@@ -37,7 +37,7 @@ export class SubscriptionController {
   @UseGuards(GoogleGuard)
   async handleGooglePay(@Req() request: RequestWithNotice) {
     const { notice } = request;
-    if (notice.subscription) {
+    if (notice?.subscription) {
       this.service.dispatchEvent('google', notice.type, notice.subscription);
     }
     this.service.dispatchEvent('google', notice.original.type, notice.original.data);

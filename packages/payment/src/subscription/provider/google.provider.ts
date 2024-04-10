@@ -44,15 +44,13 @@ export class GoogleProviderService {
     // Base64-decode the message data
     const decodedData = Buffer.from(m.data, 'base64').toString('utf8');
     const n = JSON.parse(decodedData);
+    const notice: subscription.Notice = { id: m.messageId, type: 'UNHANDLED', original: { type: 'TEST', data: n } };
 
     // 订阅消息
     if (n?.subscriptionNotification) {
       const { subscriptionId, purchaseToken, notificationType: type } = n.subscriptionNotification;
       const trans = await this.getSubscription(subscriptionId, purchaseToken);
-
-      const id = m.messageId;
-      const notice: subscription.Notice = { id, type: 'UNHANDLED', original: { type, data: m } };
-      console.log(`->trans`, trans);
+      notice.original.type = type;
 
       // case1: SUBSCRIBED
       if ([1, 4].includes(type)) {
@@ -89,8 +87,6 @@ export class GoogleProviderService {
         const subscription = this.formatEventByCancel(trans, true);
         return { ...notice, type: 'CANCELLED', subscription };
       }
-
-      return notice;
     }
 
     // 退款消息
@@ -106,7 +102,7 @@ export class GoogleProviderService {
     //   };
     // }
 
-    // return notice;
+    return notice;
   }
 
   /**
