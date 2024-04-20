@@ -5,12 +5,13 @@ import fs from 'fs';
 import moment from 'moment-timezone';
 
 import { AppleProviderService, GoogleProviderService } from './provider';
-import { ON_EVENT_KEY } from './subscription.decorator';
+import { ON_EVENT_KEY, ON_ORIGINAL_EVENT_KEY } from './subscription.decorator';
 import { subscription } from './types';
 
 @Injectable()
 export class SubscriptionService implements OnModuleInit {
   private readonly eventHandlersMap = new Map<string, any[]>();
+  private readonly originalHandlersMap = new Map<string, any[]>();
 
   constructor(
     private readonly google: GoogleProviderService,
@@ -41,25 +42,47 @@ export class SubscriptionService implements OnModuleInit {
       })
       .forEach((method) => {
         const handler = instance[method];
+        // unified event
         const metadata = Reflect.getMetadata(ON_EVENT_KEY, handler);
         if (metadata) {
-          const { provider, event } = metadata;
-          const key = `${provider.toLowerCase()}:${event.toLowerCase()}`;
+          const { event } = metadata;
+          const key = `${event.toLowerCase()}`;
           if (!this.eventHandlersMap.has(key)) {
             this.eventHandlersMap.set(key, []);
           }
           this.eventHandlersMap.get(key).push(handler.bind(instance));
         }
+
+        // original event
+        const originalMetadata = Reflect.getMetadata(ON_ORIGINAL_EVENT_KEY, handler);
+        if (originalMetadata) {
+          const { provider, event } = originalMetadata;
+          const key = `${provider.toLowerCase()}:${event.toLowerCase()}`;
+          if (!this.originalHandlersMap.has(key)) {
+            this.originalHandlersMap.set(key, []);
+          }
+          this.originalHandlersMap.get(key).push(handler.bind(instance));
+        }
       });
   }
 
-  dispatchEvent(provider: string, event: string, data: any) {
+  dispatchEvent(event: string, data: any) {
+    event = event.toLowerCase();
+    const specificHandlers = this.eventHandlersMap.get(event) || []; // 指定事件
+    const allEventHandlers = this.eventHandlersMap.get('all') || []; // 所有事件
+
+    // 合并所有匹配的处理器
+    const handlers = [...specificHandlers, ...allEventHandlers];
+    handlers.forEach((handler) => handler(data));
+  }
+
+  dispatchOriginalEvent(provider: string, event: string, data: any) {
     event = event.toLowerCase();
     provider = provider.toLowerCase();
-    const specificHandlers = this.eventHandlersMap.get(`${provider}:${event}`) || [];
-    const allEventHandlers = this.eventHandlersMap.get('all:all') || [];
-    const allPlatformSpecificEventHandlers = this.eventHandlersMap.get(`all:${event}`) || [];
-    const providerAllEventHandlers = this.eventHandlersMap.get(`${provider}:all`) || [];
+    const specificHandlers = this.originalHandlersMap.get(`${provider}:${event}`) || []; // 指定平台指定事件
+    const allEventHandlers = this.originalHandlersMap.get('all:all') || []; // 所有平台所有事件
+    const allPlatformSpecificEventHandlers = this.originalHandlersMap.get(`all:${event}`) || []; // 所有平台指定事件
+    const providerAllEventHandlers = this.originalHandlersMap.get(`${provider}:all`) || []; // 指定平台所有事件
 
     // 合并所有匹配的处理器
     const handlers = [
@@ -77,15 +100,16 @@ export class SubscriptionService implements OnModuleInit {
     let notice: subscription.Subscription;
     if (provider === 'apple') {
       notice = await this.apple.validateReceipt(receipt);
-    }
-
-    if (provider === 'google') {
+    } else if (provider === 'google') {
       notice = await this.google.validateReceipt(receipt);
+    } else {
+      throw new Error(`Unsupported provider: ${provider}`);
     }
 
     !fs.existsSync('./notify') && fs.mkdirSync('./notify');
     fs.writeFileSync(`./notify/${time}_${provider}.json`, JSON.stringify({ receipt, notice }, null, 2));
 
-    throw new Error(`Unsupported provider: ${provider}`);
+    // throw new Error(`Unsupported provider: ${provider}`);
+    return notice;
   }
 }

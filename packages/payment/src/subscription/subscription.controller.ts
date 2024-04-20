@@ -18,9 +18,9 @@ export class SubscriptionController {
   async handleStripe(@Req() request: RequestWithNotice) {
     const { notice } = request;
     if (notice.subscription) {
-      this.service.dispatchEvent('stripe', notice.type, notice.subscription);
+      this.service.dispatchEvent(notice.type, notice.subscription);
     }
-    this.service.dispatchEvent('stripe', notice.original.type, notice.original.data);
+    this.service.dispatchOriginalEvent('stripe', notice.original.type, notice.original.data);
   }
 
   @Post('apple')
@@ -28,9 +28,9 @@ export class SubscriptionController {
   async handleApplePay(@Req() request: RequestWithNotice) {
     const { notice } = request;
     if (notice.subscription) {
-      this.service.dispatchEvent('apple', notice.type, notice.subscription);
+      this.service.dispatchEvent(notice.type, notice.subscription);
     }
-    this.service.dispatchEvent('apple', notice.original.type, notice.original.data);
+    this.service.dispatchOriginalEvent('apple', notice.original.type, notice.original.data);
   }
 
   @Post('google')
@@ -38,8 +38,8 @@ export class SubscriptionController {
   async handleGooglePay(@Req() request: RequestWithNotice) {
     const { notice } = request;
     if (notice?.subscription) {
-      this.service.dispatchEvent('google', notice.type, notice.subscription);
+      this.service.dispatchEvent(notice.type, notice.subscription);
     }
-    this.service.dispatchEvent('google', notice.original.type, notice.original.data);
+    this.service.dispatchOriginalEvent('google', notice.original.type, notice.original.data);
   }
 }
