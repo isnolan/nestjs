@@ -128,35 +128,50 @@ It will be very complicated to connect the subscription interfaces and webhooks 
 
 #### Subscribed event
 ```typescript
-import { OnSubscriptionEvent, StripeProviderService } from '@isnolan/nestjs-payment';
+import { OnSubscriptionEvent, OnSubscriptionOriginalEvent, StripeProviderService } from '@isnolan/nestjs-payment';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
   constructor(private readonly stripe: StripeProviderService) {}
+
+  // All unified events 
+  @OnSubscriptionEvent({ event: 'all' })
+  handleAppleSubsriptionSuccess(data: any) {
+    console.log(`[unified]all:`, data);
+  }
+
+  // specified unified event
+  @OnSubscriptionEvent({ event: 'SUBSCRIBED' })
+  handleAppleSubsriptionSuccess(data: any) {
+    console.log(`[unified]SUBSCRIBED:`, data);
+  }
+
   // All provider event
-  @OnSubscriptionEvent({ provider: 'all', event: 'all' }) 
+  @OnSubscriptionOriginalEvent({ provider: 'all', event: 'all' }) 
   handleALLEventSuccess(data: any) {
     console.log(`[all]all:`, data);
   }
 
   // Unified events for all provider
-  @OnSubscriptionEvent({ provider: 'all', event: 'RENEWED' }) // 
+  @OnSubscriptionOriginalEvent({ provider: 'all', event: 'RENEWED' }) // 
   handleStripeSubsriptionSuccess(data: any) {
     console.log(`[all]RENEWED:`, data);
   }
 
   // Original events of the specified provider 
-  @OnSubscriptionEvent({ provider: 'all', event: 'invoice.paid' }) // origin event
+  @OnSubscriptionOriginalEvent({ provider: 'all', event: 'invoice.paid' }) // origin event
   handleStripeOriginEventSuccess(data: any) {
     console.log(`[all]invoice.paid:`, data);
   }
 
   // All events on the specified provider
-  @OnSubscriptionEvent({ provider: 'apple', event: 'all' })
+  @OnSubscriptionOriginalEvent({ provider: 'apple', event: 'all' })
   handleAppleSubsriptionSuccess(data: any) {
     console.log(`[apple]all:`, data);
   }
+
+  
 }
 
 ```
