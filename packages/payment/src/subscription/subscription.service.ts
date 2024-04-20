@@ -75,11 +75,11 @@ export class SubscriptionService implements OnModuleInit {
   async validateReceipt(provider: string, receipt: string): Promise<subscription.Subscription> {
     const time = moment().tz('Asia/Shanghai').format('YYMMDDHHmmssSSS');
     let notice: subscription.Subscription;
-    if (provider === 'Apple') {
+    if (provider === 'apple') {
       notice = await this.apple.validateReceipt(receipt);
     }
 
-    if (provider === 'Google') {
+    if (provider === 'google') {
       notice = await this.google.validateReceipt(receipt);
     }
 
