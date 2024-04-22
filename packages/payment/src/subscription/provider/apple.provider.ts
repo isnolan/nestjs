@@ -9,6 +9,7 @@ import type { subscription } from '../types';
 @Injectable()
 export class AppleProviderService {
   private verifier: SignedDataVerifier;
+  private sanboxVerifier: SignedDataVerifier;
   private readonly client: AppStoreServerAPIClient;
 
   constructor(
@@ -26,6 +27,7 @@ export class AppleProviderService {
 
     this.readAppleCerts().then((appleRootCAs) => {
       this.verifier = new SignedDataVerifier(appleRootCAs, true, environment, bundleId, appAppleId);
+      this.sanboxVerifier = new SignedDataVerifier(appleRootCAs, true, Environment.SANDBOX, bundleId, appAppleId);
     });
 
     setTimeout(() => this.requestTestNotification(), 10000);
@@ -118,8 +120,17 @@ export class AppleProviderService {
     return notice;
   }
 
+  async verifyTransaction(purchaseToken: string) {
+    try {
+      return await this.verifier.verifyAndDecodeTransaction(purchaseToken);
+    } catch (e) {
+      console.warn(e);
+      return await this.sanboxVerifier.verifyAndDecodeTransaction(purchaseToken);
+    }
+  }
+
   public async validateReceipt(purchaseToken: string): Promise<subscription.Subscription> {
-    const trans = await this.verifier.verifyAndDecodeTransaction(purchaseToken);
+    const trans = await this.verifyTransaction(purchaseToken);
     return {
       provider: 'apple',
       subscription_id: trans.originalTransactionId,
